@@ -390,6 +390,9 @@ export default class Lexical {
     let column_number = 0;
 
     while (has_char) {
+      state = "q0";
+      if (this.input[forward] === undefined) break;
+
       if (this.input[forward] === "\n") {
         forward++;
         lexeme_begin = forward;
@@ -535,9 +538,6 @@ export default class Lexical {
           lexeme_begin = forward;
           break;
       }
-      state = "q0";
-
-      if (this.input[forward] === undefined) has_char = false;
     }
 
     // for (let index of input) {
