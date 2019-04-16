@@ -4,7 +4,7 @@ import Synctatic from "./logic/syntactic";
 
 export const initial_shape = {
   analyserReducer: {
-    lexical: new Lexical(`class bintree{
+    lexical: new Lexical(""),/*`class bintree{
   
   class data{
     int dia, mes, ano;
@@ -105,7 +105,7 @@ export const initial_shape = {
     i = t.treeprint(0);
     return 0;
   }
-}`),
+}`),*/
     syntactic: new Synctatic()
   }
 };

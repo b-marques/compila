@@ -22,6 +22,7 @@ import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import logo from "../logo.svg";
+import ImportFromFileBodyComponent from "./ImportFromFileBodyComponent.js";
 
 const styles = theme => ({
   textField: {
@@ -61,6 +62,7 @@ class Main extends React.Component {
         </AppBar>
         <Grid container spacing={0}>
           <Grid item xs={6}>
+          <ImportFromFileBodyComponent/>
             <Paper className={classes.paper}>
               <TextField
                 id="outlined-multiline-flexible"
@@ -165,9 +167,10 @@ class Main extends React.Component {
                   )}
                 </TableBody>
               </Table>
-            </Paper>
+            </Paper>            
           </Grid>
-          <Grid item xs={6} />
+          <Grid item xs={6} >
+          </Grid>
         </Grid>
       </div>
     );

@@ -376,6 +376,12 @@ export default class Lexical {
 
     // console.log(this.transitions);
     this.processInput(input);
+    // Check for the various File API support.
+    if (window.File && window.FileReader && window.FileList && window.Blob) {
+      // Great success! All the File APIs are supported.
+    } else {
+      alert('The File APIs are not fully supported in this browser.');
+    }
   }
 
   processInput(input) {
@@ -391,7 +397,8 @@ export default class Lexical {
 
     while (has_char) {
       state = "q0";
-      if (this.input[forward] === undefined) break;
+      if (this.input === undefined || this.input[forward] === undefined
+        ) break;
 
       if (this.input[forward] === "\n") {
         forward++;
