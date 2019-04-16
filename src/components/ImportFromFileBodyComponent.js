@@ -2,30 +2,68 @@ import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 
+import { withStyles } from "@material-ui/core/styles";
 import { updateCode } from "../actions";
+import Button from "@material-ui/core/Button";
 
-const ImportFromFileBodyComponent = () => {
-	let fileReader;
+const styles = theme => ({
+  button: {
+    margin: theme.spacing.unit,
+    width: "98%"
+  },
+  input: {
+    display: "none"
+  }
+});
 
-	const handleFileRead = (e) => {
-		const content = fileReader.result;
-		this.updateCode(content);
-	};
+const ImportFromFileBodyComponent = props => {
+  const { classes } = props;
+  let fileReader;
 
-	const handleFileChosen = (file) => {
-		fileReader = new FileReader();
-		fileReader.onloadend = handleFileRead;
-		fileReader.readAsText(file);
-	};
+  const handleFileRead = e => {
+    const content = fileReader.result;
+    props.updateCode(content);
+  };
 
-	return <div className='upload-expense'>
-		<input type='file'
-			   id='file'
-			   className='input-file'
-			   accept='.xpp'
-			   onChange={e => handleFileChosen(e.target.files[0])}
-		/>
-	</div>;
+  const handleFileChosen = file => {
+    if (file !== undefined) {
+      fileReader = new FileReader();
+      fileReader.onloadend = handleFileRead;
+      fileReader.readAsText(file);
+    }
+  };
+
+  return (
+    // <div className="upload-expense">
+    //   <input
+    //     type="file"
+    //     id="file"
+    //     className="input-file"
+    //     accept=".xpp"
+    //     onChange={e => handleFileChosen(e.target.files[0])}
+    //   />
+    // </div>
+    <div>
+      <input
+        accept=".xpp"
+        className={classes.input}
+        id="contained-button-file"
+        multiple
+        type="file"
+        onChange={e => handleFileChosen(e.target.files[0])}
+      />
+      <label htmlFor="contained-button-file">
+        <Button
+          variant="contained"
+          component="span"
+          className={classes.button}
+          color="primary"
+        >
+          SELECT LOCAL FILE
+        </Button>
+      </label>
+    </div>
+  );
 };
 
 const mapStateToProps = state => ({ analyser: state.analyserReducer });
@@ -33,7 +71,7 @@ const mapStateToProps = state => ({ analyser: state.analyserReducer });
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      updateCode,
+      updateCode
     },
     dispatch
   );
@@ -41,4 +79,4 @@ const mapDispatchToProps = dispatch =>
 export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(ImportFromFileBodyComponent);
+)(withStyles(styles, { withTheme: true })(ImportFromFileBodyComponent));

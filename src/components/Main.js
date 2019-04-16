@@ -62,7 +62,9 @@ class Main extends React.Component {
         </AppBar>
         <Grid container spacing={0}>
           <Grid item xs={6}>
-          <ImportFromFileBodyComponent/>
+            <Paper className={classes.paper}>
+              <ImportFromFileBodyComponent />
+            </Paper>
             <Paper className={classes.paper}>
               <TextField
                 id="outlined-multiline-flexible"
@@ -131,7 +133,9 @@ class Main extends React.Component {
                   );
                 }}
               >
-                <Typography variant="subtitle1">Syntactic Analysis</Typography>
+                <Typography color="inherit" variant="subtitle1">
+                  Syntactic Analysis
+                </Typography>
               </Button>
             </Paper>
           </Grid>
@@ -167,10 +171,9 @@ class Main extends React.Component {
                   )}
                 </TableBody>
               </Table>
-            </Paper>            
+            </Paper>
           </Grid>
-          <Grid item xs={6} >
-          </Grid>
+          <Grid item xs={6} />
         </Grid>
       </div>
     );

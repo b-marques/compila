@@ -380,7 +380,7 @@ export default class Lexical {
     if (window.File && window.FileReader && window.FileList && window.Blob) {
       // Great success! All the File APIs are supported.
     } else {
-      alert('The File APIs are not fully supported in this browser.');
+      alert("The File APIs are not fully supported in this browser.");
     }
   }
 
@@ -397,8 +397,7 @@ export default class Lexical {
 
     while (has_char) {
       state = "q0";
-      if (this.input === undefined || this.input[forward] === undefined
-        ) break;
+      if (this.input === undefined || this.input[forward] === undefined) break;
 
       if (this.input[forward] === "\n") {
         forward++;
@@ -509,7 +508,7 @@ export default class Lexical {
           break;
 
         case "identifier":
-          info = this.reserved_stuff.filter(e => e.lexeme === lexeme);
+          info = this.extractInfo(info, lexeme);
           if (info.length === 0) {
             this.symbol_table.push({
               id: this.id++,
@@ -533,7 +532,7 @@ export default class Lexical {
           break;
 
         default:
-          info = this.reserved_stuff.filter(e => e.lexeme === state);
+          info = this.extractInfo(info, state);
           this.symbol_table.push({
             id: this.id++,
             token: info[0].token,
@@ -637,6 +636,11 @@ export default class Lexical {
     //     this.error_table.push({ line: line_number });
     //   }
     // }
+  }
+
+  extractInfo(info, lexeme) {
+    info = this.reserved_stuff.filter(e => e.lexeme === lexeme);
+    return info;
   }
 
   reset_ids() {
