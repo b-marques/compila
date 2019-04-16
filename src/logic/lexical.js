@@ -3,36 +3,42 @@ export default class Lexical {
     this.id = 1;
     this.input = input;
     this.reserved_stuff = [
-      { lexema: "while", token: "RW", detail: "" },
-      { lexema: "do", token: "RW", detail: "" },
-      { lexema: "break", token: "RW", detail: "" },
-      { lexema: "if", token: "RW", detail: "" },
-      { lexema: "then", token: "RW", detail: "" },
-      { lexema: "else", token: "RW", detail: "" },
-      { lexema: "true", token: "RW", detail: "" },
-      { lexema: "false", token: "RW", detail: "" },
-      { lexema: "basic", token: "RW", detail: "" },
-      { lexema: "*", token: "ARITOP", detail: "Multiplication" },
-      { lexema: "/", token: "ARITOP", detail: "Division" },
-      { lexema: "+", token: "ARITOP", detail: "Addition" },
-      { lexema: "-", token: "ARITOP", detail: "Subtraction" },
-      { lexema: ";", token: "PUNCTUATION", detail: "Semicolon" },
-      { lexema: "(", token: "PUNCTUATION", detail: "Left parenthesis" },
-      { lexema: ")", token: "PUNCTUATION", detail: "Right parenthesis" },
-      { lexema: "{", token: "PUNCTUATION", detail: "Left Brace" },
-      { lexema: "}", token: "PUNCTUATION", detail: "Right Brace" },
-      { lexema: "[", token: "PUNCTUATION", detail: "Left Bracket" },
-      { lexema: "]", token: "PUNCTUATION", detail: "Right Bracket" },
-      { lexema: "<", token: "RELOP", detail: "Less than" },
-      { lexema: "<=", token: "RELOP", detail: "Less than or equal to" },
-      { lexema: ">", token: "RELOP", detail: "Greater than" },
-      { lexema: ">=", token: "RELOP", detail: "Greater than or equal to" },
-      { lexema: "==", token: "RELOP", detail: "Equal" },
-      { lexema: "!=", token: "RELOP", detail: "Not Equal" },
-      { lexema: "&&", token: "LOGICOP", detail: "Logical AND" },
-      { lexema: "||", token: "LOGICOP", detail: "Logical OR" },
-      { lexema: "!", token: "LOGICOP", detail: "Logical NOT" },
-      { lexema: "=", token: "ASSIGNMENT", detail: "" }
+      { lexeme: "class", token: "RW", detail: "" },
+      { lexeme: "extends", token: "RW", detail: "" },
+      { lexeme: "int", token: "RW", detail: "" },
+      { lexeme: "string", token: "RW", detail: "" },
+      { lexeme: "constructor", token: "RW", detail: "" },
+      { lexeme: "break", token: "RW", detail: "" },
+      { lexeme: "print", token: "RW", detail: "" },
+      { lexeme: "read", token: "RW", detail: "" },
+      { lexeme: "return", token: "RW", detail: "" },
+      { lexeme: "super", token: "RW", detail: "" },
+      { lexeme: "if", token: "RW", detail: "" },
+      { lexeme: "else", token: "RW", detail: "" },
+      { lexeme: "for", token: "RW", detail: "" },
+      { lexeme: "new", token: "RW", detail: "" },
+      { lexeme: "null", token: "RW", detail: "" },
+      { lexeme: "*", token: "ARITOP", detail: "Multiplication" },
+      { lexeme: "/", token: "ARITOP", detail: "Division" },
+      { lexeme: "%", token: "ARITOP", detail: "Modulo" },
+      { lexeme: "+", token: "ARITOP", detail: "Addition" },
+      { lexeme: "-", token: "ARITOP", detail: "Subtraction" },
+      { lexeme: "{", token: "PUNCTUATION", detail: "Left Brace" },
+      { lexeme: "}", token: "PUNCTUATION", detail: "Right Brace" },
+      { lexeme: ";", token: "PUNCTUATION", detail: "Semicolon" },
+      { lexeme: "[", token: "PUNCTUATION", detail: "Left Bracket" },
+      { lexeme: "]", token: "PUNCTUATION", detail: "Right Bracket" },
+      { lexeme: "(", token: "PUNCTUATION", detail: "Left parenthesis" },
+      { lexeme: ")", token: "PUNCTUATION", detail: "Right parenthesis" },
+      { lexeme: ",", token: "PUNCTUATION", detail: "Comma" },
+      { lexeme: ".", token: "PUNCTUATION", detail: "Dot" },
+      { lexeme: "<", token: "RELOP", detail: "Less than" },
+      { lexeme: "<=", token: "RELOP", detail: "Less than or equal to" },
+      { lexeme: ">", token: "RELOP", detail: "Greater than" },
+      { lexeme: ">=", token: "RELOP", detail: "Greater than or equal to" },
+      { lexeme: "==", token: "RELOP", detail: "Equal" },
+      { lexeme: "!=", token: "RELOP", detail: "Not Equal" },
+      { lexeme: "=", token: "ASSIGNMENT", detail: "" }
     ];
     this.symbol_table = [];
     this.error_table = [];
@@ -102,6 +108,7 @@ export default class Lexical {
       "9",
       "*",
       "/",
+      "%",
       "+",
       "-",
       ";",
@@ -115,14 +122,16 @@ export default class Lexical {
       ">",
       "=",
       "!",
-      "&",
-      "|",
-      "."
+      ".",
+      ",",
+      '"',
+      " "
     ]);
     this.states = new Set([
       "q0",
       "*",
       "/",
+      "%",
       "+",
       "-",
       ";",
@@ -140,18 +149,18 @@ export default class Lexical {
       "==",
       "!",
       "!=",
-      "&",
-      "&&",
-      "|",
-      "||",
+      ",",
+      ".",
       "identifier",
       "num",
-      "real",
+      "string-open",
+      "string-close",
       "error"
     ]);
     this.finals = new Set([
       "*",
       "/",
+      "%",
       "+",
       "-",
       ";",
@@ -167,14 +176,15 @@ export default class Lexical {
       ">=",
       "=",
       "==",
-      "!",
       "!=",
-      "&&",
-      "||",
+      ",",
+      ".",
       "identifier",
       "num",
-      "real"
+      "string-close"
     ]);
+
+    this.possible_finals = new Set(["!", "string-open"]);
     this.initial = "q0";
     this.transitions = [];
     for (let state of this.states) {
@@ -249,6 +259,7 @@ export default class Lexical {
     this.transitions["q0"]["9"].to = new Set(["num"]);
     this.transitions["q0"]["*"].to = new Set(["*"]);
     this.transitions["q0"]["/"].to = new Set(["/"]);
+    this.transitions["q0"]["%"].to = new Set(["%"]);
     this.transitions["q0"]["+"].to = new Set(["+"]);
     this.transitions["q0"]["-"].to = new Set(["-"]);
     this.transitions["q0"][";"].to = new Set([";"]);
@@ -262,16 +273,13 @@ export default class Lexical {
     this.transitions["q0"][">"].to = new Set([">"]);
     this.transitions["q0"]["="].to = new Set(["="]);
     this.transitions["q0"]["!"].to = new Set(["!"]);
-    this.transitions["q0"]["&"].to = new Set(["&"]);
-    this.transitions["q0"]["|"].to = new Set(["|"]);
-    this.transitions["q0"]["."].to = new Set(["error"]);
+    this.transitions["q0"]["."].to = new Set(["."]);
+    this.transitions["q0"][","].to = new Set([","]);
 
     this.transitions["<"]["="].to = new Set(["<="]);
     this.transitions[">"]["="].to = new Set([">="]);
     this.transitions["="]["="].to = new Set(["=="]);
     this.transitions["!"]["="].to = new Set(["!="]);
-    this.transitions["&"]["&"].to = new Set(["&&"]);
-    this.transitions["|"]["|"].to = new Set(["||"]);
 
     this.transitions["identifier"]["a"].to = new Set(["identifier"]);
     this.transitions["identifier"]["b"].to = new Set(["identifier"]);
@@ -346,232 +354,283 @@ export default class Lexical {
     this.transitions["num"]["7"].to = new Set(["num"]);
     this.transitions["num"]["8"].to = new Set(["num"]);
     this.transitions["num"]["9"].to = new Set(["num"]);
-    this.transitions["num"]["."].to = new Set(["real"]);
 
-    this.transitions["real"]["0"].to = new Set(["real"]);
-    this.transitions["real"]["1"].to = new Set(["real"]);
-    this.transitions["real"]["2"].to = new Set(["real"]);
-    this.transitions["real"]["3"].to = new Set(["real"]);
-    this.transitions["real"]["4"].to = new Set(["real"]);
-    this.transitions["real"]["5"].to = new Set(["real"]);
-    this.transitions["real"]["6"].to = new Set(["real"]);
-    this.transitions["real"]["7"].to = new Set(["real"]);
-    this.transitions["real"]["8"].to = new Set(["real"]);
-    this.transitions["real"]["9"].to = new Set(["real"]);
+    this.transitions["-"]["0"].to = new Set(["num"]);
+    this.transitions["-"]["1"].to = new Set(["num"]);
+    this.transitions["-"]["2"].to = new Set(["num"]);
+    this.transitions["-"]["3"].to = new Set(["num"]);
+    this.transitions["-"]["4"].to = new Set(["num"]);
+    this.transitions["-"]["5"].to = new Set(["num"]);
+    this.transitions["-"]["6"].to = new Set(["num"]);
+    this.transitions["-"]["7"].to = new Set(["num"]);
+    this.transitions["-"]["8"].to = new Set(["num"]);
+    this.transitions["-"]["9"].to = new Set(["num"]);
+
+    this.transitions["q0"]['"'].to = new Set(["string-open"]);
+    for (let symbol of this.alphabet) {
+      this.transitions["string-open"][symbol] = {
+        to: new Set(["string-open"])
+      };
+    }
+    this.transitions["string-open"]['"'].to = new Set(["string-close"]);
 
     // console.log(this.transitions);
+    this.processInput(input);
   }
 
   processInput(input) {
     this.reset_ids();
-
     this.input = input;
-    // Prepare to analysis, managing whitespaces
-    let splitted_input = input.replace(/[ \t\r]+/g, " ");
-    splitted_input = splitted_input.replace(/\n/g, " \n ");
-    splitted_input = splitted_input.replace(/;/g, " ; ");
-    splitted_input = splitted_input.replace(/\(/g, " ( ");
-    splitted_input = splitted_input.replace(/\)/g, " ) ");
-    splitted_input = splitted_input.replace(/\{/g, " { ");
-    splitted_input = splitted_input.replace(/\}/g, " } ");
-    splitted_input = splitted_input.replace(/\[/g, " [ ");
-    splitted_input = splitted_input.replace(/\]/g, " ] ");
+    let lexeme = "";
+    let forward = 0;
+    let state = "q0";
+    let has_char = true;
+    let line_number = 0;
+    let lexeme_begin = 0;
+    let column_number = 0;
 
-    // Split by whitespace to read lexeme
-    splitted_input = splitted_input.split(" ");
-    let line_number = 1;
-
-    for (let lexeme of splitted_input) {
-      let state = "q0";
-      let characters = lexeme.split("");
-      for (let char of characters) {
-        if (char === "\n") {
-          line_number++;
-        } else if (this.transitions[state][char] === undefined) {
-          state = "error";
-        } else {
-          state = [...this.transitions[state][char].to][0];
-        }
-      }
-
-      if (this.finals.has(state)) {
-        let info;
-        switch (state) {
-          case "identifier":
-            info = this.reserved_stuff.filter(e => e.lexema === lexeme);
-            if (info.length === 0) {
-              this.symbol_table.push({
-                id: this.id++,
-                lexema: lexeme,
-                token: "ID",
-                detail: "",
-                line: line_number
-              });
+    while (has_char) {
+      if (this.input[forward] === "\n") {
+        forward++;
+        lexeme_begin = forward;
+        line_number++;
+        column_number = 0;
+      } else if (this.input[forward] === " ") {
+        forward++;
+        lexeme_begin = forward;
+        column_number++;
+      } else if (
+        this.transitions[state][this.input[forward]] === undefined ||
+        [...this.transitions[state][this.input[forward]].to][0] === "error"
+      ) {
+        lexeme = this.input[forward];
+        state = "error";
+      } else {
+        let was_final = false;
+        let possible_final = false;
+        do {
+          state = [...this.transitions[state][this.input[forward]].to][0];
+          if (state === "string-open") {
+            do {
+              forward++;
+              column_number++;
+              // Line/Column number control
+              if (this.input[forward] === "\n") {
+                column_number = 0;
+                line_number++;
+              }
+            } while (
+              this.input[forward] !== undefined &&
+              this.input[forward] !== '"'
+            );
+            lexeme = this.input.slice(lexeme_begin, forward + 1);
+            if (this.input[forward] === '"') {
+              state = "string-close";
             } else {
-              this.symbol_table.push({
-                id: this.id++,
-                token: info[0].token,
-                lexema: info[0].lexema,
-                detail: info[0].detail,
-                line: line_number
-              });
+              state = "error";
             }
             break;
-          case "num":
+          } else {
+            if (this.finals.has(state)) {
+              possible_final = false;
+              was_final = true;
+            } else if (this.possible_finals.has(state)) {
+              possible_final = true;
+              was_final = false;
+            }
+            column_number++;
+            forward++;
+          }
+        } while (
+          this.input[forward] !== undefined &&
+          this.transitions[state][this.input[forward]] !== undefined &&
+          [...this.transitions[state][this.input[forward]].to][0] !== "error"
+        );
+        if (was_final) {
+          lexeme = this.input.slice(lexeme_begin, forward);
+        } else if (possible_final) {
+          lexeme = this.input.slice(lexeme_begin, forward);
+          forward--;
+          column_number--;
+          state = "error";
+        }
+      }
+      let info;
+      switch (state) {
+        case "error":
+          this.error_table.push({
+            line: line_number,
+            column: column_number,
+            detail: lexeme
+          });
+          forward++;
+          column_number++;
+          lexeme_begin = forward;
+          break;
+
+        case "num":
+          this.symbol_table.push({
+            id: this.id++,
+            lexeme: lexeme,
+            token: "NUM",
+            detail: "",
+            line: line_number,
+            column: column_number - lexeme.length
+          });
+          lexeme_begin = forward;
+          break;
+
+        case "string-close":
+          this.symbol_table.push({
+            id: this.id++,
+            lexeme: lexeme,
+            token: "STRING",
+            detail: "",
+            line: line_number,
+            column: column_number
+          });
+          forward++;
+          column_number++;
+          lexeme_begin = forward;
+          break;
+
+        case "q0":
+          // DO NOTHING
+          break;
+
+        case "identifier":
+          info = this.reserved_stuff.filter(e => e.lexeme === lexeme);
+          if (info.length === 0) {
             this.symbol_table.push({
               id: this.id++,
-              lexema: lexeme,
-              token: "NUM",
+              lexeme: lexeme,
+              token: "ID",
               detail: "",
-              line: line_number
+              line: line_number,
+              column: column_number - lexeme.length
             });
-            break;
-          case "real":
-            this.symbol_table.push({
-              id: this.id++,
-              lexema: lexeme,
-              token: "REAL",
-              detail: "",
-              line: line_number
-            });
-            break;
-          default:
-            info = this.reserved_stuff.filter(e => e.lexema === state);
+            lexeme_begin = forward;
+          } else {
             this.symbol_table.push({
               id: this.id++,
               token: info[0].token,
-              lexema: info[0].lexema,
+              lexeme: info[0].lexeme,
               detail: info[0].detail,
-              line: line_number
+              line: line_number,
+              column: column_number - lexeme.length
             });
-            break;
-        }
-      } else if (state === "q0") {
-        // do nothing
-      } else {
-        this.error_table.push({ line: line_number });
+          }
+          break;
+
+        default:
+          info = this.reserved_stuff.filter(e => e.lexeme === state);
+          this.symbol_table.push({
+            id: this.id++,
+            token: info[0].token,
+            lexeme: info[0].lexeme,
+            detail: info[0].detail,
+            line: line_number,
+            column: column_number - lexeme.length
+          });
+          lexeme_begin = forward;
+          break;
       }
+      state = "q0";
+
+      if (this.input[forward] === undefined) has_char = false;
     }
+
+    // for (let index of input) {
+    // console.log(index);
+    // }
+
+    // // Prepare to analysis, managing whitespaces
+    // let splitted_input = input.replace(/[ \t\r]+/g, " ");
+    // splitted_input = splitted_input.replace(/\n/g, " \n ");
+    // splitted_input = splitted_input.replace(/;/g, " ; ");
+    // splitted_input = splitted_input.replace(/\(/g, " ( ");
+    // splitted_input = splitted_input.replace(/\)/g, " ) ");
+    // splitted_input = splitted_input.replace(/\{/g, " { ");
+    // splitted_input = splitted_input.replace(/\}/g, " } ");
+    // splitted_input = splitted_input.replace(/\[/g, " [ ");
+    // splitted_input = splitted_input.replace(/\]/g, " ] ");
+
+    // // Split by whitespace to read lexeme
+    // splitted_input = splitted_input.split(" ");
+    // let line_number = 1;
+
+    // for (let lexeme of splitted_input) {
+    //   let state = "q0";
+    //   let characters = lexeme.split("");
+    //   for (let char of characters) {
+    //     if (char === "\n") {
+    //       line_number++;
+    //     } else if (this.transitions[state][char] === undefined) {
+    //       state = "error";
+    //     } else {
+    //       state = [...this.transitions[state][char].to][0];
+    //     }
+    //   }
+
+    //   if (this.finals.has(state)) {
+    //     let info;
+    //     switch (state) {
+    //       case "identifier":
+    //         info = this.reserved_stuff.filter(e => e.lexema === lexeme);
+    //         if (info.length === 0) {
+    //           this.symbol_table.push({
+    //             id: this.id++,
+    //             lexema: lexeme,
+    //             token: "ID",
+    //             detail: "",
+    //             line: line_number
+    //           });
+    //         } else {
+    //           this.symbol_table.push({
+    //             id: this.id++,
+    //             token: info[0].token,
+    //             lexema: info[0].lexema,
+    //             detail: info[0].detail,
+    //             line: line_number
+    //           });
+    //         }
+    //         break;
+    //       case "num":
+    //         this.symbol_table.push({
+    //           id: this.id++,
+    //           lexema: lexeme,
+    //           token: "NUM",
+    //           detail: "",
+    //           line: line_number
+    //         });
+    //         break;
+    //       case "real":
+    //         this.symbol_table.push({
+    //           id: this.id++,
+    //           lexema: lexeme,
+    //           token: "REAL",
+    //           detail: "",
+    //           line: line_number
+    //         });
+    //         break;
+    //       default:
+    //         info = this.reserved_stuff.filter(e => e.lexema === state);
+    //         this.symbol_table.push({
+    //           id: this.id++,
+    //           token: info[0].token,
+    //           lexema: info[0].lexema,
+    //           detail: info[0].detail,
+    //           line: line_number
+    //         });
+    //         break;
+    //     }
+    //   } else if (state === "q0") {
+    //     // do nothing
+    //   } else {
+    //     this.error_table.push({ line: line_number });
+    //   }
+    // }
   }
-
-  //   processInput(input) {
-  //     this.reset_ids();
-
-  //     this.input = input;
-  //     // Prepare to analysis, managing whitespaces
-  //     let splitted_input = input.replace(/[ \t\r\n]+/g, " ");
-  //     splitted_input = splitted_input.replace(/;/g, " ; ");
-  //     splitted_input = splitted_input.replace(/\(/g, " ( ");
-  //     splitted_input = splitted_input.replace(/\)/g, " ) ");
-  //     splitted_input = splitted_input.replace(/\{/g, " { ");
-  //     splitted_input = splitted_input.replace(/\}/g, " } ");
-  //     splitted_input = splitted_input.replace(/\[/g, " [ ");
-  //     splitted_input = splitted_input.replace(/\]/g, " ] ");
-
-  //     // Split by whitespace to read lexeme
-  //     splitted_input = splitted_input.split(" ");
-
-  //     for (let lexema of splitted_input) {
-  //       // Check if is reserved word or special character
-  //       let element = this.already_on_reserved_stuff(lexema);
-  //       if (element) {
-  //         let index = this.reserved_stuff.indexOf(element);
-  //         this.symbol_table.push({
-  //           id: this.id++,
-  //           lexema: lexema,
-  //           token: this.reserved_stuff[index].token,
-  //           detail: this.reserved_stuff[index].detail
-  //         });
-  //       } else if (this.is_valid_id(lexema)) {
-  //         let element = this.already_on_symbol_table(lexema);
-  //         if (element) {
-  //           let index = this.symbol_table.indexOf(element);
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: this.symbol_table[index].token,
-  //             detail: this.symbol_table[index].detail
-  //           });
-  //         } else {
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: "ID",
-  //             detail: ""
-  //           });
-  //         }
-  //       } else if (this.is_valid_num(lexema)) {
-  //         let element = this.already_on_symbol_table(lexema);
-  //         if (element) {
-  //           let indexficou tankan = this.symbol_table.indexOf(element);
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: this.symbol_table[index].token,
-  //             detail: this.symbol_table[index].detail
-  //           });
-  //         } else {
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: "NUM",
-  //             detail: ""
-  //           });
-  //         }
-  //       } else if (this.is_valid_real(lexema)) {
-  //         let element = this.already_on_symbol_table(lexema);
-  //         if (element) {
-  //           let index = this.symbol_table.indexOf(element);
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: this.symbol_table[index].token,
-  //             detail: this.symbol_table[index].detail
-  //           });
-  //         } else {
-  //           this.symbol_table.push({
-  //             id: this.id++,
-  //             lexema: lexema,
-  //             token: "REAL",
-  //             detail: ""
-  //           });
-  //         }
-  //       }
-  //     }
-  //   }
-
-  // already_on_reserved_stuff(lexema) {
-  //   for (let element of this.reserved_stuff) {
-  //     if (element.lexema === lexema) {
-  //       return element;
-  //     }
-  //   }
-  //   return false;
-  // }
-
-  // is_valid_id(lexema) {
-  //   let regex = /^[a-zA-Z]([0-9]|[a-zA-Z])*$/;
-  //   return regex.test(lexema);
-  // }
-
-  // is_valid_num(lexema) {
-  //   let regex = /^([0-9])+$/;
-  //   return regex.test(lexema);
-  // }
-
-  // is_valid_real(lexema) {
-  //   let regex = /^([0-9])+.([0-9])+$/;
-  //   return regex.test(lexema);
-  // }
-
-  // already_on_symbol_table(lexema) {
-  //   for (let element of this.symbol_table) {
-  //     if (element.lexema === lexema) {
-  //       return element;
-  //     }
-  //   }
-  //   return false;
-  // }
 
   reset_ids() {
     for (let each of this.reserved_stuff) {
@@ -579,6 +638,6 @@ export default class Lexical {
     }
     this.symbol_table = [];
     this.error_table = [];
-    this.id = 1;
+    this.id = 0;
   }
 }

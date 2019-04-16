@@ -89,7 +89,9 @@ class Main extends React.Component {
                     (element, id) => {
                       return (
                         <TableRow key={id}>
-                          <TableCell>{element.line}</TableCell>
+                          <TableCell>{`Line: ${element.line} | Column: ${
+                            element.column
+                          } | Lexeme: ${element.detail}`}</TableCell>
                         </TableRow>
                       );
                     }
@@ -139,7 +141,9 @@ class Main extends React.Component {
                     <TableCell>ID</TableCell>
                     <TableCell>Token</TableCell>
                     <TableCell>Detail</TableCell>
-                    <TableCell>Lexema</TableCell>
+                    <TableCell>Lexeme</TableCell>
+                    <TableCell>Line</TableCell>
+                    <TableCell>Column</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -151,8 +155,10 @@ class Main extends React.Component {
                           <TableCell>{element.token}</TableCell>
                           <TableCell>{element.detail}</TableCell>
                           <TableCell component="th" scope="row">
-                            {element.lexema}
+                            {element.lexeme}
                           </TableCell>
+                          <TableCell>{element.line}</TableCell>
+                          <TableCell>{element.column}</TableCell>
                         </TableRow>
                       );
                     }
