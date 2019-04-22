@@ -16,7 +16,7 @@ import TableRow from "@material-ui/core/TableRow";
 
 import Grid from "@material-ui/core/Grid";
 
-import Button from "@material-ui/core/Button";
+// import Button from "@material-ui/core/Button";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -43,6 +43,16 @@ const styles = theme => ({
   logo: {
     // backgroundColor: "white",
     margin: theme.spacing.unit
+  },
+  symbolTableCell: {
+    backgroundColor: "#f9c29f"
+  },
+  symbolTableCellTitle: {
+    backgroundColor: "#fa792c"
+  },
+  tokenListCell: {
+    borderRight: "0.1em solid gray",
+    backgroundColor: "#c6dcff"
   }
 });
 
@@ -103,7 +113,7 @@ class Main extends React.Component {
                 </TableBody>
               </Table>
             </Paper>
-            <Paper className={classes.paper}>
+            {/* <Paper className={classes.paper}>
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
@@ -137,19 +147,34 @@ class Main extends React.Component {
                   Syntactic Analysis
                 </Typography>
               </Button>
-            </Paper>
+            </Paper> */}
           </Grid>
           <Grid item xs={6}>
             <Paper className={classes.paper}>
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>ID</TableCell>
-                    <TableCell>Token</TableCell>
-                    <TableCell>Detail</TableCell>
-                    <TableCell>Lexeme</TableCell>
-                    <TableCell>Line</TableCell>
-                    <TableCell>Column</TableCell>
+                    <TableCell
+                      className={classes.tokenListCell}
+                      style={{ backgroundColor: "#3954ae", color: "white" }}
+                    >
+                      Token List
+                    </TableCell>
+                    <TableCell className={classes.symbolTableCellTitle}>
+                      ID
+                    </TableCell>
+                    <TableCell className={classes.symbolTableCellTitle}>
+                      Detail
+                    </TableCell>
+                    <TableCell className={classes.symbolTableCellTitle}>
+                      Lexeme
+                    </TableCell>
+                    <TableCell className={classes.symbolTableCellTitle}>
+                      Line
+                    </TableCell>
+                    <TableCell className={classes.symbolTableCellTitle}>
+                      Column
+                    </TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -157,14 +182,28 @@ class Main extends React.Component {
                     (element, id) => {
                       return (
                         <TableRow key={id}>
-                          <TableCell>{element.id}</TableCell>
-                          <TableCell>{element.token}</TableCell>
-                          <TableCell>{element.detail}</TableCell>
-                          <TableCell component="th" scope="row">
+                          <TableCell className={classes.tokenListCell}>
+                            {element.token}
+                          </TableCell>
+                          <TableCell className={classes.symbolTableCell}>
+                            {element.id}
+                          </TableCell>
+                          <TableCell className={classes.symbolTableCell}>
+                            {element.detail}
+                          </TableCell>
+                          <TableCell
+                            component="th"
+                            scope="row"
+                            className={classes.symbolTableCell}
+                          >
                             {element.lexeme}
                           </TableCell>
-                          <TableCell>{element.line}</TableCell>
-                          <TableCell>{element.column}</TableCell>
+                          <TableCell className={classes.symbolTableCell}>
+                            {element.line}
+                          </TableCell>
+                          <TableCell className={classes.symbolTableCell}>
+                            {element.column}
+                          </TableCell>
                         </TableRow>
                       );
                     }

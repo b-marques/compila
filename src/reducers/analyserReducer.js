@@ -9,10 +9,10 @@ const analyserReducer = (state = 0, action) => {
 
       return newState;
 
-    case actionType.CODE_ANALYSIS:
-      newState.syntactic.analysis(action.symbol_table);
+    // case actionType.CODE_ANALYSIS:
+    //   newState.syntactic.analysis(action.symbol_table);
 
-      return newState;
+    // return newState;
 
     default:
       return newState;

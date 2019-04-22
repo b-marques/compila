@@ -1,10 +1,12 @@
 import Lexical from "./logic/lexical";
-import Synctatic from "./logic/syntactic";
+// import Synctatic from "./logic/syntactic";
 // import Grammar from "./logic/Grammar";
 
 export const initial_shape = {
   analyserReducer: {
-    lexical: new Lexical(""),/*`class bintree{
+    lexical: new Lexical(
+      ""
+    ) /*`class bintree{
   
   class data{
     int dia, mes, ano;
@@ -106,6 +108,6 @@ export const initial_shape = {
     return 0;
   }
 }`),*/
-    syntactic: new Synctatic()
+    // syntactic: new Synctatic()
   }
 };
