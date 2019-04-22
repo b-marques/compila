@@ -374,8 +374,6 @@ export default class Lexical {
     }
     this.transitions["string-open"]['"'].to = new Set(["string-close"]);
 
-    // console.log(this.transitions);
-    this.processInput(input);
     // Check for the various File API support.
     if (window.File && window.FileReader && window.FileList && window.Blob) {
       // Great success! All the File APIs are supported.
@@ -545,97 +543,6 @@ export default class Lexical {
           break;
       }
     }
-
-    // for (let index of input) {
-    // console.log(index);
-    // }
-
-    // // Prepare to analysis, managing whitespaces
-    // let splitted_input = input.replace(/[ \t\r]+/g, " ");
-    // splitted_input = splitted_input.replace(/\n/g, " \n ");
-    // splitted_input = splitted_input.replace(/;/g, " ; ");
-    // splitted_input = splitted_input.replace(/\(/g, " ( ");
-    // splitted_input = splitted_input.replace(/\)/g, " ) ");
-    // splitted_input = splitted_input.replace(/\{/g, " { ");
-    // splitted_input = splitted_input.replace(/\}/g, " } ");
-    // splitted_input = splitted_input.replace(/\[/g, " [ ");
-    // splitted_input = splitted_input.replace(/\]/g, " ] ");
-
-    // // Split by whitespace to read lexeme
-    // splitted_input = splitted_input.split(" ");
-    // let line_number = 1;
-
-    // for (let lexeme of splitted_input) {
-    //   let state = "q0";
-    //   let characters = lexeme.split("");
-    //   for (let char of characters) {
-    //     if (char === "\n") {
-    //       line_number++;
-    //     } else if (this.transitions[state][char] === undefined) {
-    //       state = "error";
-    //     } else {
-    //       state = [...this.transitions[state][char].to][0];
-    //     }
-    //   }
-
-    //   if (this.finals.has(state)) {
-    //     let info;
-    //     switch (state) {
-    //       case "identifier":
-    //         info = this.reserved_stuff.filter(e => e.lexema === lexeme);
-    //         if (info.length === 0) {
-    //           this.symbol_table.push({
-    //             id: this.id++,
-    //             lexema: lexeme,
-    //             token: "ID",
-    //             detail: "",
-    //             line: line_number
-    //           });
-    //         } else {
-    //           this.symbol_table.push({
-    //             id: this.id++,
-    //             token: info[0].token,
-    //             lexema: info[0].lexema,
-    //             detail: info[0].detail,
-    //             line: line_number
-    //           });
-    //         }
-    //         break;
-    //       case "num":
-    //         this.symbol_table.push({
-    //           id: this.id++,
-    //           lexema: lexeme,
-    //           token: "NUM",
-    //           detail: "",
-    //           line: line_number
-    //         });
-    //         break;
-    //       case "real":
-    //         this.symbol_table.push({
-    //           id: this.id++,
-    //           lexema: lexeme,
-    //           token: "REAL",
-    //           detail: "",
-    //           line: line_number
-    //         });
-    //         break;
-    //       default:
-    //         info = this.reserved_stuff.filter(e => e.lexema === state);
-    //         this.symbol_table.push({
-    //           id: this.id++,
-    //           token: info[0].token,
-    //           lexema: info[0].lexema,
-    //           detail: info[0].detail,
-    //           line: line_number
-    //         });
-    //         break;
-    //     }
-    //   } else if (state === "q0") {
-    //     // do nothing
-    //   } else {
-    //     this.error_table.push({ line: line_number });
-    //   }
-    // }
   }
 
   extractInfo(info, lexeme) {
