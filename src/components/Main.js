@@ -24,6 +24,8 @@ import Typography from "@material-ui/core/Typography";
 import logo from "../logo.svg";
 import ImportFromFileBodyComponent from "./ImportFromFileBodyComponent.js";
 
+let PADDING_SIZE = "10px";
+
 const styles = theme => ({
   textField: {
     width: "98%",
@@ -45,13 +47,22 @@ const styles = theme => ({
     margin: theme.spacing.unit
   },
   symbolTableCell: {
-    backgroundColor: "#f9c29f"
+    backgroundColor: "#f9c29f",
+    padding: PADDING_SIZE,
+    align: "center"
   },
   symbolTableCellTitle: {
-    backgroundColor: "#fa792c"
+    backgroundColor: "#fa792c",
+    padding: PADDING_SIZE
+  },
+  tokenListCellTitle: {
+    backgroundColor: "#3954ae",
+    color: "white",
+    padding: PADDING_SIZE
   },
   tokenListCell: {
     borderRight: "0.1em solid gray",
+    padding: PADDING_SIZE,
     backgroundColor: "#c6dcff"
   }
 });
@@ -71,7 +82,7 @@ class Main extends React.Component {
           </Toolbar>
         </AppBar>
         <Grid container spacing={0}>
-          <Grid item xs={6}>
+          <Grid item xs={4}>
             <Paper className={classes.paper}>
               <ImportFromFileBodyComponent />
             </Paper>
@@ -149,15 +160,12 @@ class Main extends React.Component {
               </Button>
             </Paper> */}
           </Grid>
-          <Grid item xs={6}>
+          <Grid item xs={8}>
             <Paper className={classes.paper}>
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
-                    <TableCell
-                      className={classes.tokenListCell}
-                      style={{ backgroundColor: "#3954ae", color: "white" }}
-                    >
+                    <TableCell className={classes.tokenListCellTitle}>
                       Token List
                     </TableCell>
                     <TableCell className={classes.symbolTableCellTitle}>
@@ -181,7 +189,7 @@ class Main extends React.Component {
                   {this.props.analyser.lexical.symbol_table.map(
                     (element, id) => {
                       return (
-                        <TableRow key={id}>
+                        <TableRow key={id} style={{ height: 25 }}>
                           <TableCell className={classes.tokenListCell}>
                             {element.token}
                           </TableCell>
