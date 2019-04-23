@@ -1,3 +1,11 @@
+/*
+ *  @file Main.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 23/04/2019
+ *  @version 1.0
+ */
+
 import React from "react";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";

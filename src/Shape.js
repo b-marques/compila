@@ -1,3 +1,11 @@
+/*
+ *  @file Shape.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 23/04/2019
+ *  @version 1.0
+ */
+
 import Lexical from "./logic/lexical";
 // import Synctatic from "./logic/syntactic";
 // import Grammar from "./logic/Grammar";

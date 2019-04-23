@@ -1,3 +1,11 @@
+/*
+ *  @file analyserReducer.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 23/04/2019
+ *  @version 1.0
+ */
+
 import * as actionType from "../actions/ActionType";
 
 const analyserReducer = (state = 0, action) => {

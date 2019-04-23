@@ -1,3 +1,11 @@
+/*
+ *  @file lexical.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 23/04/2019
+ *  @version 1.0
+ */
+
 export default class Lexical {
   constructor(input) {
     this.id = 1; /** Atributo ID da tabela de símbolo */
