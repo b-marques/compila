@@ -1,7 +1,9 @@
 export default class Lexical {
   constructor(input) {
-    this.id = 1;
-    this.input = input;
+    this.id = 1; /** Atributo ID da tabela de símbolo */
+    this.input = input; /** Texto lido do arquivo fornecido */
+
+    /** Estrutura contendo palavras reservadas e tokens padrões */
     this.reserved_stuff = [
       { lexeme: "class", token: "RW", detail: "" },
       { lexeme: "extends", token: "RW", detail: "" },
@@ -40,9 +42,9 @@ export default class Lexical {
       { lexeme: "!=", token: "RELOP", detail: "Not Equal" },
       { lexeme: "=", token: "ASSIGNMENT", detail: "" }
     ];
+
     this.symbol_table = [];
     this.error_table = [];
-
     this.alphabet = new Set([
       "a",
       "b",
@@ -183,10 +185,12 @@ export default class Lexical {
       "num",
       "string-close"
     ]);
-
+    /** Estados que não são finais, mas podem vir a ser */
     this.possible_finals = new Set(["!", "string-open"]);
     this.initial = "q0";
+
     this.transitions = [];
+    /** Inicializa todas as transições do automato como erro */
     for (let state of this.states) {
       this.transitions[state] = [];
       for (let symbol of this.alphabet) {
@@ -194,7 +198,7 @@ export default class Lexical {
       }
     }
 
-    // Define transitions from initial state
+    /** Definição das transições a partir do estado inicial */
     this.transitions["q0"]["a"].to = new Set(["identifier"]);
     this.transitions["q0"]["b"].to = new Set(["identifier"]);
     this.transitions["q0"]["c"].to = new Set(["identifier"]);
@@ -276,11 +280,13 @@ export default class Lexical {
     this.transitions["q0"]["."].to = new Set(["."]);
     this.transitions["q0"][","].to = new Set([","]);
 
+    /** Definição das transições de operações relacionais */
     this.transitions["<"]["="].to = new Set(["<="]);
     this.transitions[">"]["="].to = new Set([">="]);
     this.transitions["="]["="].to = new Set(["=="]);
     this.transitions["!"]["="].to = new Set(["!="]);
 
+    /** Definição das transições de identificadores */
     this.transitions["identifier"]["a"].to = new Set(["identifier"]);
     this.transitions["identifier"]["b"].to = new Set(["identifier"]);
     this.transitions["identifier"]["c"].to = new Set(["identifier"]);
@@ -344,6 +350,7 @@ export default class Lexical {
     this.transitions["identifier"]["8"].to = new Set(["identifier"]);
     this.transitions["identifier"]["9"].to = new Set(["identifier"]);
 
+    /** Definição das transições para reconhecimento de números (int-constant) */
     this.transitions["num"]["0"].to = new Set(["num"]);
     this.transitions["num"]["1"].to = new Set(["num"]);
     this.transitions["num"]["2"].to = new Set(["num"]);
@@ -354,7 +361,6 @@ export default class Lexical {
     this.transitions["num"]["7"].to = new Set(["num"]);
     this.transitions["num"]["8"].to = new Set(["num"]);
     this.transitions["num"]["9"].to = new Set(["num"]);
-
     this.transitions["-"]["0"].to = new Set(["num"]);
     this.transitions["-"]["1"].to = new Set(["num"]);
     this.transitions["-"]["2"].to = new Set(["num"]);
@@ -366,6 +372,7 @@ export default class Lexical {
     this.transitions["-"]["8"].to = new Set(["num"]);
     this.transitions["-"]["9"].to = new Set(["num"]);
 
+    /** Definição das transições para reconhecimento de strngs */
     this.transitions["q0"]['"'].to = new Set(["string-open"]);
     for (let symbol of this.alphabet) {
       this.transitions["string-open"][symbol] = {
@@ -374,14 +381,15 @@ export default class Lexical {
     }
     this.transitions["string-open"]['"'].to = new Set(["string-close"]);
 
-    // Check for the various File API support.
+    /** Verifica o suporte a API de arquivos. */
     if (window.File && window.FileReader && window.FileList && window.Blob) {
-      // Great success! All the File APIs are supported.
+      /** Great success! All the File APIs are supported. */
     } else {
       alert("The File APIs are not fully supported in this browser.");
     }
   }
 
+  /** Função responsável por processar o arquivo de entrada */
   processInput(input) {
     this.reset_ids();
     this.input = input;
@@ -393,35 +401,45 @@ export default class Lexical {
     let lexeme_begin = 0;
     let column_number = 0;
 
+    /** Executa enquanto houver caracteres para serem lidos */
     while (has_char) {
       state = "q0";
+      /** Verifica se existem caracteres para serem lidos  */
       if (this.input === undefined || this.input[forward] === undefined) break;
 
+      /** Se o caractere for "\n" é realizado o skip para o próximo caractere */
       if (this.input[forward] === "\n") {
         forward++;
         lexeme_begin = forward;
         line_number++;
         column_number = 0;
+
+        /** Se o caractere for " " é realizado o skip para o próximo caractere */
       } else if (this.input[forward] === " ") {
         forward++;
         lexeme_begin = forward;
         column_number++;
+
+        /** Se o caractere transitar para estados de erro  */
       } else if (
         this.transitions[state][this.input[forward]] === undefined ||
         [...this.transitions[state][this.input[forward]].to][0] === "error"
       ) {
         lexeme = this.input[forward];
         state = "error";
+
+        /** Se for outro caractere válido será realizado seu processamento */
       } else {
         let was_final = false;
         let possible_final = false;
+
         do {
           state = [...this.transitions[state][this.input[forward]].to][0];
           if (state === "string-open") {
             do {
               forward++;
               column_number++;
-              // Line/Column number control
+              /** Controle de quebra de linha */
               if (this.input[forward] === "\n") {
                 column_number = 0;
                 line_number++;
@@ -453,6 +471,7 @@ export default class Lexical {
           this.transitions[state][this.input[forward]] !== undefined &&
           [...this.transitions[state][this.input[forward]].to][0] !== "error"
         );
+
         if (was_final) {
           lexeme = this.input.slice(lexeme_begin, forward);
         } else if (possible_final) {
@@ -463,7 +482,11 @@ export default class Lexical {
         }
       }
       let info;
+
+      /** Switch-Case responsável por definir as ações conforme o estado final
+       * do automato após a extração de um lexema. */
       switch (state) {
+        /** Estado de ERRO */
         case "error":
           this.error_table.push({
             line: line_number,
@@ -474,7 +497,7 @@ export default class Lexical {
           column_number++;
           lexeme_begin = forward;
           break;
-
+        /** Estado de identificação de um NÚMERO */
         case "num":
           this.symbol_table.push({
             id: this.id++,
@@ -487,6 +510,7 @@ export default class Lexical {
           lexeme_begin = forward;
           break;
 
+        /** Estado de identificação de uma STRING */
         case "string-close":
           this.symbol_table.push({
             id: this.id++,
@@ -501,10 +525,12 @@ export default class Lexical {
           lexeme_begin = forward;
           break;
 
+        /** Estado INICIAL */
         case "q0":
           // DO NOTHING
           break;
 
+        /** Estado de identificação de um IDENTIFICADOR (ID ou RW) */
         case "identifier":
           info = this.extractInfo(info, lexeme);
           if (info.length === 0) {
@@ -529,6 +555,7 @@ export default class Lexical {
           }
           break;
 
+        /** OUTROS */
         default:
           info = this.extractInfo(info, state);
           this.symbol_table.push({
@@ -556,6 +583,6 @@ export default class Lexical {
     }
     this.symbol_table = [];
     this.error_table = [];
-    this.id = 0;
+    this.id = 1;
   }
 }
