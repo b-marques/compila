@@ -239,7 +239,7 @@ export default class Syntactic {
       },
       {
         head: 'INSIDEFOR',
-        prods:[[ 'ATRIBTSTAT', ';', 'INSIDEFORB' ],
+        prods:[[ 'ATRIBSTAT', ';', 'INSIDEFORB' ],
                [               ';', 'INSIDEFORB']]
       },                         
 
@@ -251,7 +251,7 @@ export default class Syntactic {
                     
       {
         head: 'INSIDEFORC',
-        prods:[[ 'ATRIBTSTAT' ],[ '&']]
+        prods:[[ 'ATRIBSTAT' ],[ '&']]
       },
       {
         head: 'STATLIST',
