@@ -24,7 +24,7 @@ import TableRow from "@material-ui/core/TableRow";
 
 import Grid from "@material-ui/core/Grid";
 
-// import Button from "@material-ui/core/Button";
+import Button from "@material-ui/core/Button";
 
 import AppBar from "@material-ui/core/AppBar";
 import Toolbar from "@material-ui/core/Toolbar";
@@ -132,7 +132,7 @@ class Main extends React.Component {
                 </TableBody>
               </Table>
             </Paper>
-            {/* <Paper className={classes.paper}>
+             <Paper className={classes.paper}>
               <Table className={classes.table}>
                 <TableHead>
                   <TableRow>
@@ -166,7 +166,7 @@ class Main extends React.Component {
                   Syntactic Analysis
                 </Typography>
               </Button>
-            </Paper> */}
+            </Paper> 
           </Grid>
           <Grid item xs={8}>
             <Paper className={classes.paper}>

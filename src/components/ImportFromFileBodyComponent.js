@@ -42,15 +42,6 @@ const ImportFromFileBodyComponent = props => {
   };
 
   return (
-    // <div className="upload-expense">
-    //   <input
-    //     type="file"
-    //     id="file"
-    //     className="input-file"
-    //     accept=".xpp"
-    //     onChange={e => handleFileChosen(e.target.files[0])}
-    //   />
-    // </div>
     <div>
       <input
         accept=".xpp"
