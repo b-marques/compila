@@ -1,6 +1,7 @@
 export default class Syntactic {
   constructor() {
     this.T = new Set([
+      "ife",
       "method",
       "ident",
       "int-constant",
@@ -72,7 +73,6 @@ export default class Syntactic {
       "RETURNSTATB",
       "SUPERSTAT",
       "IFSTAT",
-      "IFSTATB",
       "FORSTAT",
       "INSIDEFOR",
       "INSIDEFORB",
@@ -236,11 +236,10 @@ export default class Syntactic {
       },
       {
         head: "IFSTAT",
-        prods: [["if", "(", "EXPRESSION", ")", "STATEMENT", "IFSTATB"]]
-      },
-      {
-        head: "IFSTATB",
-        prods: [["&"], ["else", "STATEMENT"]]
+        prods: [
+          ["if", "(", "EXPRESSION", ")", "STATEMENT"],
+          ["ife", "(", "EXPRESSION", ")", "STATEMENT", "else", "STATEMENT"]
+        ]
       },
       {
         head: "FORSTAT",
@@ -656,7 +655,11 @@ export default class Syntactic {
         continue;
       }
 
-      if (
+      if (!this.N.has(stack_symbol)) {
+        this.result[0].message = "Syntactic error!";
+        this.result[0].line_number = input_element.line;
+        return;
+      } else if (
         this.parsing_table[stack_symbol][input_element.lexeme].prod.has(
           "<erro>"
         )

@@ -16,6 +16,7 @@ export default class Lexical {
 
     /** Estrutura contendo palavras reservadas e tokens padrões */
     this.reserved_stuff = [
+      { lexeme: "ife", token: "RW", detail: "" },
       { lexeme: "method", token: "RW", detail: "" },
       { lexeme: "class", token: "RW", detail: "" },
       { lexeme: "extends", token: "RW", detail: "" },
