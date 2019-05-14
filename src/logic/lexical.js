@@ -10,9 +10,13 @@ export default class Lexical {
   constructor(input) {
     this.id = 1; /** Atributo ID da tabela de símbolo */
     this.input = input; /** Texto lido do arquivo fornecido */
+    this.symbol_table = [];
+    this.error_table = [];
+    this.transitions = [];
 
     /** Estrutura contendo palavras reservadas e tokens padrões */
     this.reserved_stuff = [
+      { lexeme: "method", token: "RW", detail: "" },
       { lexeme: "class", token: "RW", detail: "" },
       { lexeme: "extends", token: "RW", detail: "" },
       { lexeme: "int", token: "RW", detail: "" },
@@ -51,8 +55,6 @@ export default class Lexical {
       { lexeme: "=", token: "ASSIGNMENT", detail: "" }
     ];
 
-    this.symbol_table = [];
-    this.error_table = [];
     this.alphabet = new Set([
       "a",
       "b",
@@ -197,7 +199,6 @@ export default class Lexical {
     this.possible_finals = new Set(["!", "string-open"]);
     this.initial = "q0";
 
-    this.transitions = [];
     /** Inicializa todas as transições do automato como erro */
     for (let state of this.states) {
       this.transitions[state] = [];
@@ -380,7 +381,7 @@ export default class Lexical {
     this.transitions["-"]["8"].to = new Set(["num"]);
     this.transitions["-"]["9"].to = new Set(["num"]);
 
-    /** Definição das transições para reconhecimento de strngs */
+    /** Definição das transições para reconhecimento de strings */
     this.transitions["q0"]['"'].to = new Set(["string-open"]);
     for (let symbol of this.alphabet) {
       this.transitions["string-open"][symbol] = {
