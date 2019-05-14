@@ -96,13 +96,14 @@ export default class Syntactic {
       "UNARYEXPR",
       "FACTOR",
       "ARGLIST",
-      "ARGLISTS"
+      "ARGLISTS",
+      "VARORATRIB"
     ]);
 
     this.P = [
       {
         head: "PROGRAM",
-        prods: [["CLASSLIST"], ["&"]]
+        prods: [["&"], ["CLASSLIST"]]
       },
       {
         head: "CLASSLIST",
@@ -110,7 +111,7 @@ export default class Syntactic {
       },
       {
         head: "CLASSLISTB",
-        prods: [["CLASSLIST"], ["&"]]
+        prods: [["&"], ["CLASSLIST"]]
       },
       {
         head: "CLASSDECL",
@@ -130,15 +131,15 @@ export default class Syntactic {
       },
       {
         head: "VARDECLS",
-        prods: [["VARDECL", ";", "VARDECLS"], ["&"]]
+        prods: [["&"], ["VARDECL", ";", "VARDECLS"]]
       },
       {
         head: "CONSTRUCTDECLS",
-        prods: [["CONSTRUCTDECL", "CONSTRUCTDECLS"], ["&"]]
+        prods: [["&"], ["CONSTRUCTDECL", "CONSTRUCTDECLS"]]
       },
       {
         head: "METHODDECLS",
-        prods: [["METHODDECL", "METHODDECLS"], ["&"]]
+        prods: [["&"], ["METHODDECL", "METHODDECLS"]]
       },
       {
         head: "TYPE",
@@ -150,11 +151,11 @@ export default class Syntactic {
       },
       {
         head: "BRACKETS",
-        prods: [["[", "]", "BRACKETS"], ["&"]]
+        prods: [["&"], ["[", "]", "BRACKETS"]]
       },
       {
         head: "MULTIVARDECL",
-        prods: [["VARDECLCOMMA", "MULTIVARDECL"], ["&"]]
+        prods: [["&"], ["VARDECLCOMMA", "MULTIVARDECL"]]
       },
       {
         head: "VARDECLCOMMA",
@@ -174,17 +175,18 @@ export default class Syntactic {
       },
       {
         head: "PARAMLIST",
-        prods: [["TYPE", "ident", "BRACKETS", "MULTIPARAM"], ["&"]]
+        prods: [["&"], ["TYPE", "ident", "BRACKETS", "MULTIPARAM"]]
       },
       {
         head: "MULTIPARAM",
-        prods: [[",", "TYPE", "ident", "BRACKETS", "MULTIPARAM"], ["&"]]
+        prods: [["&"], [",", "TYPE", "ident", "BRACKETS", "MULTIPARAM"]]
       },
       {
         head: "STATEMENT",
         prods: [
-          ["VARDECL", ";"],
-          ["ATRIBSTAT", ";"],
+          ["int", "ident", "BRACKETS", "MULTIVARDECL", ";"],
+          ["string", "ident", "BRACKETS", "MULTIVARDECL", ";"],
+          ["ident", "VARORATRIB"],
           ["PRINTSTAT", ";"],
           ["READSTAT", ";"],
           ["RETURNSTAT", ";"],
@@ -196,7 +198,13 @@ export default class Syntactic {
           [";"]
         ]
       },
-
+      {
+        head: "VARORATRIB",
+        prods: [
+          ["ident", "BRACKETS", "MULTIVARDECL", ";"],
+          ["LVALUE", "=", "ATRIBSTATB", ";"]
+        ]
+      },
       {
         head: "ATRIBSTAT",
         prods: [["ident", "LVALUE", "=", "ATRIBSTATB"]]
@@ -220,7 +228,7 @@ export default class Syntactic {
       },
       {
         head: "RETURNSTATB",
-        prods: [["EXPRESSION"], ["&"]]
+        prods: [["&"], ["EXPRESSION"]]
       },
       {
         head: "SUPERSTAT",
@@ -232,7 +240,7 @@ export default class Syntactic {
       },
       {
         head: "IFSTATB",
-        prods: [["else", "STATEMENT"], ["&"]]
+        prods: [["&"], ["else", "STATEMENT"]]
       },
       {
         head: "FORSTAT",
@@ -250,7 +258,7 @@ export default class Syntactic {
 
       {
         head: "INSIDEFORC",
-        prods: [["ATRIBSTAT"], ["&"]]
+        prods: [["&"], ["ATRIBSTAT"]]
       },
       {
         head: "STATLIST",
@@ -258,14 +266,14 @@ export default class Syntactic {
       },
       {
         head: "STATLISTB",
-        prods: [["STATLIST"], ["&"]]
+        prods: [["&"], ["STATLIST"]]
       },
       {
         head: "LVALUE",
         prods: [
+          ["&"],
           ["[", "EXPRESSION", "]", "LVALUE"],
-          [".", "ident", "LVALUEB"],
-          ["&"]
+          [".", "ident", "LVALUEB"]
         ]
       },
 
@@ -298,7 +306,7 @@ export default class Syntactic {
       },
       {
         head: "EXPRESSIONSB",
-        prods: [["EXPRESSIONS"], ["&"]]
+        prods: [["&"], ["EXPRESSIONS"]]
       },
       {
         head: "EXPRESSION",
@@ -307,11 +315,11 @@ export default class Syntactic {
       {
         head: "EXPRESSIONB",
         prods: [
+          ["&"],
           ["<", "EXPRESSIONC"],
           [">", "EXPRESSIONC"],
           ["==", "NUMEXPRESSION"],
-          ["!=", "NUMEXPRESSION"],
-          ["&"]
+          ["!=", "NUMEXPRESSION"]
         ]
       },
       {
@@ -324,7 +332,7 @@ export default class Syntactic {
       },
       {
         head: "TERMS",
-        prods: [["+", "TERM", "TERMS"], ["-", "TERM", "TERMS"], ["&"]]
+        prods: [["&"], ["+", "TERM", "TERMS"], ["-", "TERM", "TERMS"]]
       },
       {
         head: "TERM",
@@ -333,10 +341,10 @@ export default class Syntactic {
       {
         head: "UNARYEXPRS",
         prods: [
+          ["&"],
           ["*", "UNARYEXPR", "UNARYEXPRS"],
           ["/", "UNARYEXPR", "UNARYEXPRS"],
-          ["%", "UNARYEXPR", "UNARYEXPRS"],
-          ["&"]
+          ["%", "UNARYEXPR", "UNARYEXPRS"]
         ]
       },
 
@@ -357,11 +365,11 @@ export default class Syntactic {
       },
       {
         head: "ARGLIST",
-        prods: [["EXPRESSION", "ARGLISTS"], ["&"]]
+        prods: [["&"], ["EXPRESSION", "ARGLISTS"]]
       },
       {
         head: "ARGLISTS",
-        prods: [[",", "EXPRESSION", "ARGLISTS"], ["&"]]
+        prods: [["&"], [",", "EXPRESSION", "ARGLISTS"]]
       }
     ];
 
@@ -374,9 +382,7 @@ export default class Syntactic {
       this.follow[each] = new Set();
     }
 
-    for (let head of this.N) {
-      this.compute_first_set(head);
-    }
+    this.compute_first_set();
 
     this.compute_follow_set();
 
@@ -384,35 +390,80 @@ export default class Syntactic {
     this.build_parsing_table();
     this.stack = [];
     this.result = [{ message: ", line_number: " }];
+
+    console.log(this.first);
+    console.log(this.follow);
+    console.log(this.parsing_table);
   }
 
   compute_first_set(head) {
-    let rule = this.P.filter(prod => prod.head === head);
-    for (let production of rule[0].prods) {
-      console.log(production[0]);
-      console.log("-------------");
-      // If is a terminal or epsilon add to first set of head
-      if (this.T.has(production[0]) || production[0] === "&") {
-        this.first[head].add(production[0]);
-      } else {
-        // If not terminal first symbol is non terminal and first set has something
-        if (this.first[production[0]].size !== 0) {
-          for (let each of this.first[production[0]]) {
-            this.first[head].add(each);
+    let old_first = [];
+    let add_terminals_epsilon = false;
+    while (true) {
+      for (let each of this.N) {
+        old_first[each] = new Set([...this.first[each]]);
+      }
+
+      if (!add_terminals_epsilon) {
+        for (let head of this.N) {
+          let rule = this.P.filter(prod => prod.head === head);
+          for (let production of rule[0].prods) {
+            // If is a terminal or epsilon add to first set of head
+            if (this.T.has(production[0]) || production[0] === "&") {
+              this.first[head].add(production[0]);
+            }
           }
-        } else {
-          this.compute_first_set(production[0]);
-          this.compute_first_set(head);
+        }
+        add_terminals_epsilon = true;
+      }
+      for (let head of this.N) {
+        let rule = this.P.filter(prod => prod.head === head);
+        for (let production of rule[0].prods) {
+          // If is non terminal
+          if (this.N.has(production[0])) {
+            // If first symbol is non terminal and first set has something
+            if (this.first[production[0]].size !== 0) {
+              for (let each of this.first[production[0]]) {
+                if (each === "&") {
+                  let i = 1;
+                  let next_production = production[i];
+                  let chained_epsilon = true;
+                  while (next_production !== undefined) {
+                    if (this.T.has(next_production)) {
+                      this.first[head].add(next_production);
+                      chained_epsilon = false;
+                      break;
+                    } else if (this.first[next_production].has("&")) {
+                      this.first[next_production].forEach(e => {
+                        if (e !== "&") this.first[head].add(e);
+                      });
+                    } else {
+                      this.first[next_production].forEach(e =>
+                        this.first[head].add(e)
+                      );
+                      chained_epsilon = false;
+                      break;
+                    }
+                    i++;
+                    next_production = production[i];
+                  }
+                  if (chained_epsilon) this.first[head].add("&");
+                  continue;
+                }
+                this.first[head].add(each);
+              }
+            }
+          }
         }
       }
+      if (!this.first_has_changed(old_first)) break;
     }
   }
   compute_follow_set() {
     // 1 – Se A é o símbolo inicial da gramática -> $ ∈ Follow(A)
     this.follow[this.S].add("$");
 
-    let loops = 0;
-    do {
+    while (true) {
       let old_follow = [];
       for (let each of this.N) {
         old_follow[each] = new Set([...this.follow[each]]);
@@ -422,63 +473,61 @@ export default class Syntactic {
         let rule = this.P.filter(prod => prod.head === A);
         for (let production of rule[0].prods) {
           for (const [i, element] of production.entries()) {
-            let B = element;
-            let Beta = new Set();
-            let index = i + 1;
-            while (production[index] !== undefined) {
-              Beta.add(production[index]);
-              index++;
-            }
-            let BetaFirst = Beta.size > 0 ? this.get_first(Beta) : new Set();
-
-            // 2 – Se A -> α B β ∈ P ∧ β ≠ ε -> adicione first(β) em Follow(B)
-            if (loops === 0) {
-              if (this.N.has(B) && (Beta.size > 0 && [...Beta][0] !== "&")) {
+            if (this.N.has(element)) {
+              let B = element;
+              let Beta = new Set();
+              let index = i + 1;
+              while (production[index] !== undefined) {
+                Beta.add(production[index]);
+                index++;
+              }
+              let BetaFirst = Beta.size > 0 ? this.get_first(Beta) : new Set();
+              // 2 – Se A -> α B β ∈ P ∧ β ≠ ε -> adicione first(β) em Follow(B)
+              if (Beta.size > 0) {
                 for (let each of BetaFirst) {
                   this.follow[B].add(each);
                 }
                 this.follow[B].delete("&");
               }
-            }
-
-            // 3 – Se A -> αB (ou A->αBβ, onde ε ∈ First(β)) ∈ P -> adicione Follow(A) em Follow(B)
-            if (this.N.has(B) && (Beta.size === 0 || BetaFirst.has("&"))) {
-              for (let follow of this.follow[A]) {
-                this.follow[B].add(follow);
+              // 3 – Se A -> αB (ou A->αBβ, onde ε ∈ First(β)) ∈ P -> adicione Follow(A) em Follow(B)
+              if (Beta.size === 0 || BetaFirst.has("&")) {
+                for (let follow_A of this.follow[A]) {
+                  this.follow[B].add(follow_A);
+                }
               }
-              this.follow[B].delete("&");
             }
           }
         }
       }
-
-      loops++;
-
       if (!this.follow_has_changed(old_follow)) break;
-    } while (true);
+    }
   }
 
   get_first(Beta) {
-    if (this.T.has([...Beta][0])) {
-      return new Set([[...Beta][0]]);
-    }
+    if ([...Beta][0] === "&") return new Set("&");
     let FirstBeta = new Set();
     let i = 0;
+    let has_epsilon = false;
     while ([...Beta][i] !== undefined) {
       if (this.T.has([...Beta][i])) {
         FirstBeta.add([...Beta][i]);
-        FirstBeta.delete("&");
-        return FirstBeta;
-      }
-      for (let each of this.first[[...Beta][i]]) {
-        FirstBeta.add(each);
-      }
-      if (!this.first[[...Beta][i]].has("&")) {
-        FirstBeta.delete("&");
-        return FirstBeta;
+        has_epsilon = false;
+        break;
+      } else {
+        for (let each of this.first[[...Beta][i]]) {
+          FirstBeta.add(each);
+        }
+        if (this.first[[...Beta][i]].has("&")) {
+          FirstBeta.delete("&");
+          has_epsilon = true;
+        } else {
+          has_epsilon = false;
+          break;
+        }
       }
       i++;
     }
+    if (has_epsilon) FirstBeta.add("&");
     return FirstBeta;
   }
 
@@ -497,69 +546,93 @@ export default class Syntactic {
     return false;
   }
 
+  first_has_changed(old_first) {
+    for (let each of this.N) {
+      if (!this.equal_sets(old_first[each], this.first[each])) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   build_parsing_table() {
     for (let A of this.N) {
       this.parsing_table[A] = [];
       for (let b of this.T) {
-        this.parsing_table[A][b] = { prod: ["<erro>"] };
+        this.parsing_table[A][b] = { prod: new Set() };
       }
-      this.parsing_table[A]["$"] = { prod: ["<erro>"] };
+      this.parsing_table[A]["$"] = { prod: new Set() };
     }
     for (let A of this.N) {
-      for (let a of this.first[A]) {
-        if (a === "&") {
+      let rule = this.P.filter(prod => prod.head === A);
+      for (let production of rule[0].prods) {
+        if (production[0] === "&") {
           for (let b of this.follow[A]) {
-            this.parsing_table[A][b].prod = ["&"];
+            this.parsing_table[A][b].prod.add("&");
+          }
+          if (this.follow[A].has("$")) {
+            this.parsing_table[A]["$"].prod.add("&");
           }
         } else {
-          let rule = this.P.filter(prod => prod.head === A);
-          for (let production of rule[0].prods) {
-            if (production[0] === a) {
-              this.parsing_table[A][a].prod = production;
-            } else if (this.N.has(production[0])) {
-              for (let each of this.first[production[0]]) {
-                if (each !== "&") {
-                  if (this.parsing_table[A][each].prod.includes("<erro>")) {
-                    this.parsing_table[A][each].prod = production;
-                  }
-                }
+          for (let a of this.get_first(new Set(production))) {
+            if (a === "&") {
+              for (let b of this.follow[A]) {
+                this.parsing_table[A][b].prod.add(production);
               }
+              if (this.follow[A].has("$")) {
+                this.parsing_table[A]["$"].prod.add("&");
+              }
+            } else {
+              this.parsing_table[A][a].prod.add(production);
             }
           }
         }
       }
     }
+    // Set empty to error state
+    for (let A of this.N) {
+      for (let b of this.T) {
+        if (!this.parsing_table[A][b].prod.size) {
+          this.parsing_table[A][b].prod.add("<erro>");
+        }
+      }
+    }
+
+    // Check if grammar is LL(1) through parsing table
+    for (let A of this.N) {
+      for (let b of this.T) {
+        if (this.parsing_table[A][b].prod.size > 1)
+          console.log(`A = ${A}  b = ${b}\n {false}`);
+      }
+    }
   }
 
   analysis(symbol_table) {
-    console.clear();
-    console.log(this.parsing_table);
-    if (!symbol_table.length) {
+    this.symbol_table = JSON.parse(JSON.stringify(symbol_table));
+    if (!this.symbol_table.length) {
       this.result[0].message = "Empty symbol table!";
       this.result[0].line_number = "";
       return;
     }
     this.result = [{ message: ", line_number: " }];
     this.stack = ["$", "PROGRAM"];
-    symbol_table.push({
-      id: symbol_table[symbol_table.length - 1].id + 1,
+    this.symbol_table.push({
+      id: this.symbol_table[this.symbol_table.length - 1].id + 1,
       token: "END",
-      lexema: "$",
+      lexeme: "$",
       detail: "",
-      line: symbol_table[symbol_table.length - 1].line_number
+      line: this.symbol_table[this.symbol_table.length - 1].line_number
     });
 
-    while (symbol_table.length > 0) {
+    while (this.symbol_table.length > 0) {
       console.log(this.stack);
-
       let stack_symbol = this.stack.pop();
       if (stack_symbol === "&") {
         continue;
       }
 
-      let input_element = symbol_table.shift();
-
-      if (stack_symbol === "$" && symbol_table.length) {
+      let input_element = this.symbol_table.shift();
+      if (stack_symbol === "$" && this.symbol_table.length) {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
@@ -578,12 +651,13 @@ export default class Syntactic {
         default:
           break;
       }
-
+      console.log(input_element.lexeme);
       if (input_element.lexeme === stack_symbol) {
         continue;
       }
+
       if (
-        this.parsing_table[stack_symbol][input_element.lexeme].prod.includes(
+        this.parsing_table[stack_symbol][input_element.lexeme].prod.has(
           "<erro>"
         )
       ) {
@@ -591,9 +665,11 @@ export default class Syntactic {
         this.result[0].line_number = input_element.line;
         return;
       } else {
-        symbol_table.unshift(input_element);
+        this.symbol_table.unshift(input_element);
 
-        let items = this.parsing_table[stack_symbol][input_element.lexeme].prod;
+        let items = [
+          ...this.parsing_table[stack_symbol][input_element.lexeme].prod
+        ][0];
         let i = items.length;
         while (i--) {
           this.stack.push(items[i]);
