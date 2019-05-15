@@ -192,5 +192,5 @@ New: 'new';
 Null: 'null';
 
 Identifier: [a-zA-Z_]( [a-zA-Z_] | [0-9])*;
-IntConstant: ('-')? [0-9];
+IntConstant: ('-')? ([0-9])+;
 StringConstant: '"' (.)*? '"';
