@@ -607,14 +607,22 @@ export default class Syntactic {
   }
 
   analysis(symbol_table) {
+    /* Make a local copy of the symbol table */
     this.symbol_table = JSON.parse(JSON.stringify(symbol_table));
+    
+    /* Check if symbol table not empty */
     if (!this.symbol_table.length) {
       this.result[0].message = "Empty symbol table!";
       this.result[0].line_number = "";
       return;
     }
+    /* Init result message variable */
     this.result = [{ message: ", line_number: " }];
+
+    /* Add símbolo $ e símbolo inicial à pilha */
     this.stack = ["$", "PROGRAM"];
+
+    /* Add símbolo $ ao final da lista de tokens */
     this.symbol_table.push({
       id: this.symbol_table[this.symbol_table.length - 1].id + 1,
       token: "END",
@@ -623,6 +631,7 @@ export default class Syntactic {
       line: this.symbol_table[this.symbol_table.length - 1].line_number
     });
 
+    /* Loop de processamento da stack */
     while (this.symbol_table.length > 0) {
       console.log(this.stack);
       let stack_symbol = this.stack.pop();
@@ -637,6 +646,7 @@ export default class Syntactic {
         return;
       }
 
+      /* Mapeamento de id, num e string para os respectivos tokens */
       switch (input_element.token) {
         case "ID":
           input_element.lexeme = "ident";
@@ -651,14 +661,20 @@ export default class Syntactic {
           break;
       }
       console.log(input_element.lexeme);
+      /* Quando o símbolo do topo da pilha é igual ao próximo token, 
+       * token é removido da pilha e da lista de tokens. Avança para a próxima iteração do loop. */
       if (input_element.lexeme === stack_symbol) {
         continue;
       }
 
+      /* Se o símbolo da pilha não pertence aos não terminais: ERRO */
       if (!this.N.has(stack_symbol)) {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
+      
+      /* Senão, se a transição na tabela preditiva entre simbolo da pilha e próximo token for para
+       * um estado de erro: ERRO */
       } else if (
         this.parsing_table[stack_symbol][input_element.lexeme].prod.has(
           "<erro>"
@@ -667,6 +683,8 @@ export default class Syntactic {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
+
+      /* Senão, devolve o token a lista de tokens e empilha os símbolos de acordo com a tabela preditiva */
       } else {
         this.symbol_table.unshift(input_element);
 
