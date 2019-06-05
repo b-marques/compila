@@ -14,13 +14,15 @@ const analyserReducer = (state = 0, action) => {
   switch (action.type) {
     case actionType.UPDATE_CODE:
       newState.lexical.processInput(action.text);
-
       return newState;
 
     case actionType.CODE_ANALYSIS:
       newState.syntactic.analysis(action.symbol_table);
+      return newState;
 
-    return newState;
+    case actionType.CODE_ANALYSIS_EXPS_DEC:
+      newState.syntacticExpsDec.analysis(action.symbol_table);
+      return newState;
 
     default:
       return newState;

@@ -48,7 +48,9 @@ export default class Lexical {
       { lexeme: ",", token: "PUNCTUATION", detail: "Comma" },
       { lexeme: ".", token: "PUNCTUATION", detail: "Dot" },
       { lexeme: "<", token: "RELOP", detail: "Less than" },
+      { lexeme: "<=", token: "RELOP", detail: "Less Equal than" },
       { lexeme: ">", token: "RELOP", detail: "Greater than" },
+      { lexeme: ">=", token: "RELOP", detail: "Greater Equal than" },
       { lexeme: "==", token: "RELOP", detail: "Equal" },
       { lexeme: "!=", token: "RELOP", detail: "Not Equal" },
       { lexeme: "=", token: "ASSIGNMENT", detail: "" }

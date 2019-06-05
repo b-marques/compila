@@ -17,3 +17,8 @@ export const codeAnalysis = symbol_table => ({
   type: actionType.CODE_ANALYSIS,
   symbol_table: symbol_table
 });
+
+export const codeAnalysisExpsDec = symbol_table => ({
+  type: actionType.CODE_ANALYSIS_EXPS_DEC,
+  symbol_table: symbol_table
+});

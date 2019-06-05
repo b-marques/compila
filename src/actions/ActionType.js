@@ -8,3 +8,4 @@
 
 export const UPDATE_CODE = "UPDATE_CODE";
 export const CODE_ANALYSIS = "CODE_ANALYSIS";
+export const CODE_ANALYSIS_EXPS_DEC = "CODE_ANALYSIS_EXPS_DEC";

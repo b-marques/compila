@@ -88,7 +88,6 @@ export default class Syntactic {
       "EXPRESSIONSB",
       "EXPRESSION",
       "EXPRESSIONB",
-      "EXPRESSIONC",
       "NUMEXPRESSION",
       "TERMS",
       "TERM",
@@ -315,15 +314,13 @@ export default class Syntactic {
         head: "EXPRESSIONB",
         prods: [
           ["&"],
-          ["<", "EXPRESSIONC"],
-          [">", "EXPRESSIONC"],
+          ["<", "NUMEXPRESSION"],
+          ["<=", "NUMEXPRESSION"],
+          [">=", "NUMEXPRESSION"],
+          [">", "NUMEXPRESSION"],
           ["==", "NUMEXPRESSION"],
           ["!=", "NUMEXPRESSION"]
         ]
-      },
-      {
-        head: "EXPRESSIONC",
-        prods: [["NUMEXPRESSION"], ["=", "NUMEXPRESSION"]]
       },
       {
         head: "NUMEXPRESSION",
@@ -388,11 +385,13 @@ export default class Syntactic {
     this.parsing_table = [];
     this.build_parsing_table();
     this.stack = [];
-    this.result = [{ message: ", line_number: " }];
+    this.result = [{ message: "", line_number: "" }];
 
-    console.log(this.first);
-    console.log(this.follow);
-    console.log(this.parsing_table);
+    // console.log(this.first);
+    // console.log(this.follow);
+    // console.log(this.parsing_table);
+
+    console.log(`A gramatática é LL(1)? ${this.is_ll1()}`);
   }
 
   compute_first_set(head) {
@@ -590,18 +589,12 @@ export default class Syntactic {
     }
     // Set empty to error state
     for (let A of this.N) {
+      if (!this.parsing_table[A]["$"].prod.size)
+        this.parsing_table[A]["$"].prod.add("<erro>");
       for (let b of this.T) {
         if (!this.parsing_table[A][b].prod.size) {
           this.parsing_table[A][b].prod.add("<erro>");
         }
-      }
-    }
-
-    // Check if grammar is LL(1) through parsing table
-    for (let A of this.N) {
-      for (let b of this.T) {
-        if (this.parsing_table[A][b].prod.size > 1)
-          console.log(`A = ${A}  b = ${b}\n {false}`);
       }
     }
   }
@@ -609,15 +602,13 @@ export default class Syntactic {
   analysis(symbol_table) {
     /* Make a local copy of the symbol table */
     this.symbol_table = JSON.parse(JSON.stringify(symbol_table));
-    
+
     /* Check if symbol table not empty */
     if (!this.symbol_table.length) {
       this.result[0].message = "Empty symbol table!";
       this.result[0].line_number = "";
       return;
     }
-    /* Init result message variable */
-    this.result = [{ message: ", line_number: " }];
 
     /* Add símbolo $ e símbolo inicial à pilha */
     this.stack = ["$", "PROGRAM"];
@@ -628,7 +619,7 @@ export default class Syntactic {
       token: "END",
       lexeme: "$",
       detail: "",
-      line: this.symbol_table[this.symbol_table.length - 1].line_number
+      line: this.symbol_table[this.symbol_table.length - 1].line
     });
 
     /* Loop de processamento da stack */
@@ -661,7 +652,7 @@ export default class Syntactic {
           break;
       }
       console.log(input_element.lexeme);
-      /* Quando o símbolo do topo da pilha é igual ao próximo token, 
+      /* Quando o símbolo do topo da pilha é igual ao próximo token,
        * token é removido da pilha e da lista de tokens. Avança para a próxima iteração do loop. */
       if (input_element.lexeme === stack_symbol) {
         continue;
@@ -672,9 +663,9 @@ export default class Syntactic {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
-      
-      /* Senão, se a transição na tabela preditiva entre simbolo da pilha e próximo token for para
-       * um estado de erro: ERRO */
+
+        /* Senão, se a transição na tabela preditiva entre simbolo da pilha e próximo token for para
+         * um estado de erro: ERRO */
       } else if (
         this.parsing_table[stack_symbol][input_element.lexeme].prod.has(
           "<erro>"
@@ -684,7 +675,7 @@ export default class Syntactic {
         this.result[0].line_number = input_element.line;
         return;
 
-      /* Senão, devolve o token a lista de tokens e empilha os símbolos de acordo com a tabela preditiva */
+        /* Senão, devolve o token a lista de tokens e empilha os símbolos de acordo com a tabela preditiva */
       } else {
         this.symbol_table.unshift(input_element);
 
@@ -700,5 +691,65 @@ export default class Syntactic {
     this.result[0].message = "Success!";
     this.result[0].line_number = "";
     return;
+  }
+
+  /*
+   * A grammar G is LL(1) if and only if whenever A -> α | β are two distinct
+   * productions of G, the following conditions hold:
+   *
+   *   1. For no terminal a do both α and β derive strings beginning with a.
+   *   2. At most one of α and β can derive the empty string.
+   *   3. If β *⇒ ε, then α does not derive any string beginning with a terminal
+   *      in FOLLOW(A). Likewise, if α *⇒ ε, then β does not derive any string
+   *      beginning with a terminal in FOLLOW(A).
+   *
+   * The first two conditions are equivalent to the statement that FIRST(α) and
+   * FIRST(β) are disjoint sets. The third condition is equivalent to stating
+   * that if ε is in FIRST(β), then FIRST(α) and FOLLOW(A) are disjoint sets,
+   * and likewise if ε is in FIRST(α).
+   *
+   * Alfred V. Aho. Compilers: Principles, Techniques, and Tools (2nd Edition)
+   */
+  is_ll1() {
+    let is_ll1 = true;
+
+    for (let production of this.P) {
+      for (let prod1 in production.prods) {
+        for (let prod2 in production.prods) {
+          if (prod1 !== prod2) {
+            /* Condições 1 e 2 */
+            let setA = new Set(production.prods[prod1]);
+            let setB = new Set(production.prods[prod2]);
+            let firstA = this.get_first(setA);
+            let firstB = this.get_first(setB);
+            is_ll1 = is_ll1 && this.is_disjoint(firstA, firstB);
+
+            /* Condição 3 */
+            if (firstB.has("&")) {
+              is_ll1 =
+                is_ll1 &&
+                this.is_disjoint(firstA, this.follow[production.head]);
+            }
+            if (firstA.has("&")) {
+              is_ll1 =
+                is_ll1 &&
+                this.is_disjoint(firstB, this.follow[production.head]);
+            }
+          }
+        }
+      }
+    }
+
+    return is_ll1;
+  }
+
+  is_disjoint(setA, setB) {
+    let _intersection = new Set();
+    for (let elem of setB) {
+      if (setA.has(elem)) {
+        _intersection.add(elem);
+      }
+    }
+    return _intersection.size === 0;
   }
 }

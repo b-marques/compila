@@ -8,13 +8,14 @@
 
 import Lexical from "./logic/lexical";
 import Synctatic from "./logic/syntactic";
+import SyntacticExpsDec from "./logic/syntacticExpsDec";
 // import Grammar from "./logic/Grammar";
 
 export const initial_shape = {
   analyserReducer: {
     lexical: new Lexical(
       ""
-    ), /*`class bintree{
+    ) /*`class bintree{
   
   class data{
     int dia, mes, ano;
@@ -115,7 +116,8 @@ export const initial_shape = {
     i = t.treeprint(0);
     return 0;
   }
-}`),*/
-    syntactic: new Synctatic()
+}`),*/,
+    syntactic: new Synctatic(),
+    syntacticExpsDec: new SyntacticExpsDec()
   }
 };
