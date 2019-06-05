@@ -1,0 +1,127 @@
+class matrix 
+{
+  int W, H;
+  int data[][];
+
+  constructor(){
+    data = new int[10][10];
+    W = 10;
+    H = 10;
+  }
+
+  constructor(int w, int h)
+  {
+    data = new int[w][h];
+    W = w;
+    H = h;
+  }
+
+  method matrix sum(matrix matrixA) {
+    int i, j;
+    matrix result;
+    
+    result = new matrix(W,H);
+    
+    for (i = 0; i < H; i = i + 1)
+    {
+      for (j = 0; j < H; j = j + 1)
+      {
+        result.data[i][j] = data[i][j] + matrixA.data[i][j];
+      }
+    }
+    return result;
+  }
+
+  method matrix subtract(matrix matrixA) {
+    int i, j;
+    matrix result;
+    
+    result = new matrix(W,H);
+    
+    for (i = 0; i < H; i = i + 1)
+    {
+      for (j = 0; j < H; j = j + 1)
+      {
+        result.data[i][j] = data[i][j] - matrixA.data[i][j];
+      }
+    }
+    return result;
+  }
+
+  method matrix multiplyBy(int value) {
+    int i, j;
+    matrix result;
+    
+    result = new matrix(W,H);
+    
+    for (i = 0; i < H; i = i + 1)
+    {
+      for (j = 0; j < H; j = j + 1)
+      {
+        result.data[i][j] = data[i][j] * value;
+      }
+    }
+    return result;
+  }
+
+  method string printString() {
+    int i, j;
+    string result;
+    result = "";
+
+    for (i = 0; i < H; i = i + 1)
+    {
+      for (j = 0; j < H; j = j + 1)
+      {
+        result = result + data[i][j] + " ";
+      }
+      result = result + "\n";
+    }
+    
+    return result;
+  }
+
+  method int start()
+  {
+    int w, h, i, j;
+    matrix m1, m2, result;
+
+    print "Informe o número de linhas: ";
+    read h;
+    print "Informe o número de colunas: ";
+    read w;
+    
+    m1 = new matrix(w,h);
+    m2 = new matrix(w,h);
+
+    for (i = 0; i < h; i = i + 1)
+    {
+      for (j = 0; j < w; j = j + 1)
+      {
+        print "Informe um valor para: matrix1[" + i + "][" + j + "] = ";
+        int k;
+        read k;
+        m1.data[i][j] = k;
+      }
+      print "\n";
+    }
+
+    for (i = 0; i < h; i = i + 1)
+    {
+      for (j = 0; j < w; j = j + 1)
+      {
+        print "Informe um valor para: matrix2[" + i + "][" + j + "] = ";
+        int k;
+        read k;
+        m2.data[i][j] = k;
+      }
+      print "\n";
+    }
+
+    result = m1.sum(m2);
+
+    print result.printString();
+
+    return(0);
+  }
+}

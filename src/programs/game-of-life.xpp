@@ -1,0 +1,111 @@
+class GameOfLife 
+{ 
+  int W, H;
+  int grid[][];
+
+  constructor(int w, int h)
+  {
+    grid = new int[w][h];
+    W = w;
+    H = h;
+  }
+
+  constructor()
+  {
+    grid = new int[10][10];
+    W = 10;
+    H = 10;
+  }
+  
+  method string nextGenerate() 
+  { 
+    int i, j, l, m;
+    string futureString;
+    int future[][];
+    future = new int[W][H]; 
+
+    for (l = 1; l < H - 1; l=l+1) 
+    { 
+      for (m = 1; m < W - 1; m=m+1) 
+      { 
+        int aliveNeighbours;
+        aliveNeighbours = 0;
+        for( i = -1 ; i <= 1 ; i = i + 1 ) 
+            for ( j = -1; j <= 1; j=j+1) 
+                aliveNeighbours = aliveNeighbours + grid[l + i][m + j]; 
+
+        aliveNeighbours = aliveNeighbours - grid[l][m]; 
+
+        future[l][m] = grid[l][m]; 
+
+        if( grid[l][m] == 1 )
+          if( aliveNeighbours < 2 ) 
+            future[l][m] = 0; 
+
+        if( grid[l][m] == 1 )
+          if( aliveNeighbours > 3 ) 
+            future[l][m] = 0; 
+
+        if( grid[l][m] == 0 ) 
+          if( aliveNeighbours == 3 ) 
+            future[l][m] = 1; 
+      } 
+    } 
+
+    futureString = "";
+    for ( i = 0; i < H; i = i+1)
+    {
+      for ( j = 0; j < W; j = j+1)
+      {
+        ife (future[i][j] == 0)
+          futureString = futureString + "." ;
+        else
+          futureString = futureString + "*" ;
+      }
+      futureString = futureString + "\n" ;
+    }
+    return futureString;
+  }
+  
+  method int start()
+  {
+    int i, j;
+    GameOfLife gol;
+
+    gol = new GameOfLife();
+
+    print "Initializing grid...\n";
+    for (i = 0; i < gol.H; i = i+1)
+    {
+      for (j = 0; j < gol.W; j = j+1)
+      {
+        gol.grid[i][j] = 0;
+        if (i == j)
+          gol.grid[i][j] = 1;
+      }
+    }
+
+    print "Original Generation"; 
+    for (i = 0; i < gol.H; i = i+1)
+    { 
+        for (j = 0; j < gol.W; j = j+1)
+        { 
+            ife (gol.grid[i][j] == 0) 
+            {
+                print "." ;
+            } 
+            else
+            {
+                print "*" ;
+            }
+        } 
+        print "\n"; 
+    } 
+    print "\n";
+
+    print "Next Generation"; 
+    print gol.nextGenerate(); 
+
+    return(0);
+  } 
+} 
