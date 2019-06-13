@@ -1,3 +1,5 @@
+import addActionsToProds from "./sdtSyntaxTreeExps.js";
+
 export default class SyntacticExpsDec {
   constructor() {
     this.T = new Set([
@@ -362,7 +364,11 @@ export default class SyntacticExpsDec {
     }
 
     /* Add símbolo $ e símbolo inicial à pilha */
-    this.stack = ["$", "PROGRAM"];
+    this.stack = [
+      { name: "$" },
+      { name: "Synthesize.PROGRAM" },
+      { name: "PROGRAM" }
+    ];
 
     /* Add símbolo $ ao final da lista de tokens */
     this.symbol_table.push({
@@ -375,14 +381,34 @@ export default class SyntacticExpsDec {
 
     /* Loop de processamento da stack */
     while (this.symbol_table.length > 0) {
-      console.log(this.stack);
+      console.log(this.stack.map(name => name));
       let stack_symbol = this.stack.pop();
-      if (stack_symbol === "&") {
+
+      if (
+        stack_symbol.name.includes("Synthesize") ||
+        stack_symbol.name.includes("Action")
+      ) {
+        if (stack_symbol.actions !== undefined) {
+          stack_symbol.actions(this.stack);
+          console.log(stack_symbol.name);
+          console.log(stack_symbol);
+        }
+        if (stack_symbol.name === "Synthesize.PROGRAM") {
+          console.log(stack_symbol.name);
+          console.log(stack_symbol);
+        }
+        continue;
+      }
+
+      if (stack_symbol.name === "&") {
+        if (stack_symbol.actions !== undefined) {
+          stack_symbol.actions(this.stack);
+        }
         continue;
       }
 
       let input_element = this.symbol_table.shift();
-      if (stack_symbol === "$" && this.symbol_table.length > 1) {
+      if (stack_symbol.name === "$" && this.symbol_table.length > 1) {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
@@ -391,33 +417,37 @@ export default class SyntacticExpsDec {
       /* Mapeamento de id, num e string para os respectivos tokens */
       switch (input_element.token) {
         case "ID":
-          input_element.lexeme = "ident";
+          input_element.lexemeAux = "ident";
           break;
         case "NUM":
-          input_element.lexeme = "int-constant";
+          input_element.lexemeAux = "int-constant";
           break;
         case "STRING":
-          input_element.lexeme = "string-constant";
+          input_element.lexemeAux = "string-constant";
           break;
         default:
+          input_element.lexemeAux = input_element.lexeme;
           break;
       }
-      console.log(input_element.lexeme);
       /* Quando o símbolo do topo da pilha é igual ao próximo token,
        * token é removido da pilha e da lista de tokens. Avança para a próxima iteração do loop. */
-      if (input_element.lexeme === stack_symbol) {
+      if (input_element.lexemeAux === stack_symbol.name) {
+        if (stack_symbol.actions !== undefined) {
+          stack_symbol.actions(this.stack, input_element.lexeme);
+        }
         continue;
       }
 
       /* Se o símbolo da pilha não pertence aos não terminais: ERRO */
-      if (!this.N.has(stack_symbol)) {
+      if (!this.N.has(stack_symbol.name)) {
         this.result[0].message = "Syntactic error!";
         this.result[0].line_number = input_element.line;
         return;
 
         /* Trecho de código pra tratar incoerência entre léxico LL1X++ vs EXPS e DEC */
       } else if (
-        this.parsing_table[stack_symbol][input_element.lexeme] === undefined
+        this.parsing_table[stack_symbol.name][input_element.lexemeAux] ===
+        undefined
       ) {
         this.result[0].message =
           "Syntactic error! - Don't use reserved words from LL1X++";
@@ -427,7 +457,7 @@ export default class SyntacticExpsDec {
         /* Senão, se a transição na tabela preditiva entre simbolo da pilha e próximo token for para
          * um estado de erro: ERRO */
       } else if (
-        this.parsing_table[stack_symbol][input_element.lexeme].prod.has(
+        this.parsing_table[stack_symbol.name][input_element.lexemeAux].prod.has(
           "<erro>"
         )
       ) {
@@ -440,8 +470,10 @@ export default class SyntacticExpsDec {
         this.symbol_table.unshift(input_element);
 
         let items = [
-          ...this.parsing_table[stack_symbol][input_element.lexeme].prod
+          ...this.parsing_table[stack_symbol.name][input_element.lexemeAux].prod
         ][0];
+
+        items = addActionsToProds(stack_symbol, items);
         let i = items.length;
         while (i--) {
           this.stack.push(items[i]);
