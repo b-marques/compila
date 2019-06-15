@@ -116,13 +116,13 @@ expressionsb: expressions | /* epsilon */;
 expression: numexpression expressionb;
 
 expressionb:
-	'<' expressionc
-	| '>' expressionc
+	'<' numexpression
+	| '<=' numexpression
+	| '>' numexpression
+	| '>=' numexpression
 	| '==' numexpression
 	| '!=' numexpression
 	| /* epsilon */;
-
-expressionc: numexpression | '=' numexpression;
 
 numexpression: term terms;
 
@@ -168,7 +168,9 @@ Comma: ',';
 Dot: '.';
 
 Less: '<';
+LessEqual: '<=';
 Greater: '>';
+GreaterEqual: '>=';
 Equal: '==';
 NotEqual: '!=';
 Assign: '=';

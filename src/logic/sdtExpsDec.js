@@ -324,8 +324,7 @@ export default function addActionsToProds(head, production) {
           name: "Synthesize.FACTOR",
           actions(stack) {
             /* UNARYEXPR.node = - FACTOR.syn */
-            this.syn.value = "-" + this.syn.value;
-            stack[stack.length - 1].node = this.syn;
+            stack[stack.length - 1].node = { value: "minus", center: this.syn };
           }
         });
       }
@@ -334,7 +333,6 @@ export default function addActionsToProds(head, production) {
           name: "Synthesize.FACTOR",
           actions(stack) {
             /* UNARYEXPR.node = + FACTOR.syn */
-            this.syn.value = "+" + this.syn.value;
             stack[stack.length - 1].node = this.syn;
           }
         });

@@ -23,6 +23,7 @@ import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import Divider from "@material-ui/core/Divider";
 
 import Grid from "@material-ui/core/Grid";
 
@@ -33,6 +34,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import logo from "../logo.svg";
 import ImportFromFileBodyComponent from "./ImportFromFileBodyComponent.js";
+
+import Viz from "viz.js";
+import { Module, render } from "viz.js/full.render.js";
 
 let PADDING_SIZE = "10px";
 
@@ -83,6 +87,70 @@ class Main extends React.Component {
     this.state = { ll1_analysis: true, tabNumber: 0 };
   }
 
+  buildGraphTransitions(node, transitions, id) {
+    let myid = id;
+    transitions += `"${myid}" [label="${node.value}"];`;
+    if (node.left) {
+      transitions += `"${myid}" -> "${id + 1}";`;
+      [transitions, id] = this.buildGraphTransitions(
+        node.left,
+        transitions,
+        id + 1
+      );
+    }
+    if (node.right) {
+      transitions += `"${myid}" -> "${id + 1}";`;
+      [transitions, id] = this.buildGraphTransitions(
+        node.right,
+        transitions,
+        id + 1
+      );
+    }
+    if (node.center) {
+      transitions += `"${myid}" -> "${id + 1}";`;
+      [transitions, id] = this.buildGraphTransitions(
+        node.center,
+        transitions,
+        id + 1
+      );
+    }
+    return [transitions, id];
+  }
+
+  checkForGraph = () => {
+    const viz = new Viz({ Module, render });
+    let tree = this.props.analyser.syntacticExpsDec.syntax_tree;
+    console.log(tree);
+
+    let [transitions] = this.buildGraphTransitions(tree, "", 1);
+
+    let graph = `digraph G {size="8.5"; node [style=filled,color=white];
+${transitions}}`;
+    // rankdir=TD;
+    // size="8,5"
+    // node [shape = point]; start
+    // node [shape = doublecircle];
+    // ${[...fa.finals].join(" ")}
+    // node [shape = circle];
+    // start -> ${fa.initial}
+    // ${transitions}
+
+    viz
+      .renderSVGElement(graph)
+      .then(function(element) {
+        let count = document.getElementById("graphCard").childElementCount;
+        if (count === 0) {
+          document.getElementById("graphCard").appendChild(element);
+        } else {
+          let item = document.getElementById("graphCard");
+          item.replaceChild(element, item.childNodes[0]);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -109,7 +177,7 @@ class Main extends React.Component {
 
         {this.state.tabNumber === 0 && (
           <Grid container spacing={0}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
               <Paper className={classes.paper}>
                 <ImportFromFileBodyComponent />
               </Paper>
@@ -187,7 +255,7 @@ class Main extends React.Component {
                 </Button>
               </Paper>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12} md={8}>
               <Paper className={classes.paper}>
                 <Table className={classes.table}>
                   <TableHead>
@@ -247,12 +315,11 @@ class Main extends React.Component {
                 </Table>
               </Paper>
             </Grid>
-            <Grid item xs={6} />
           </Grid>
         )}
         {this.state.tabNumber === 1 && (
           <Grid container spacing={0}>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={6}>
               <Paper className={classes.paper}>
                 <ImportFromFileBodyComponent />
               </Paper>
@@ -331,8 +398,39 @@ class Main extends React.Component {
                   </Typography>
                 </Button>
               </Paper>
+              <Paper className={classes.paper}>
+                <Typography variant="h6" className={classes.title}>
+                  Graphical Representation (EXPS Syntax Tree)
+                </Typography>
+                <Divider />
+                <Typography variant="h6" className={classes.title}>
+                  <div id="graphCard">{this.checkForGraph()}</div>
+                </Typography>
+                <Divider />
+                <Divider />
+                <Typography variant="h6" className={classes.tokenListCell}>
+                  Inline Representation (Postorder)
+                </Typography>
+                <Divider />
+                <div id="inlineSyntaxTree" className={classes.tokenListCell}>
+                  {this.props.analyser.syntacticExpsDec.printTree()}
+                </div>
+                <Divider />
+                <Divider />
+                <Typography variant="h6" className={classes.symbolTableCell}>
+                  Three Addres Code
+                </Typography>
+                <Divider />
+                <div id="threeAddressCode" className={classes.symbolTableCell}>
+                  {this.props.analyser.syntacticExpsDec
+                    .printThreeAddressCode()[0]
+                    .map(e => (
+                      <p>{e}</p>
+                    ))}
+                </div>
+              </Paper>
             </Grid>
-            <Grid item xs={8}>
+            <Grid item xs={12} md={6}>
               <Paper className={classes.paper}>
                 <Table className={classes.table}>
                   <TableHead>
@@ -392,7 +490,6 @@ class Main extends React.Component {
                 </Table>
               </Paper>
             </Grid>
-            <Grid item xs={6} />
           </Grid>
         )}
       </div>

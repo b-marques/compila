@@ -1,4 +1,4 @@
-import addActionsToProds from "./sdtSyntaxTreeExps.js";
+import addActionsToProds from "./sdtExpsDec.js";
 
 export default class SyntacticExpsDec {
   constructor() {
@@ -141,7 +141,7 @@ export default class SyntacticExpsDec {
     this.build_parsing_table();
     this.stack = [];
     this.result = [{ message: "", line_number: "" }];
-
+    this.syntax_tree = {};
     // console.log(this.first);
     // console.log(this.follow);
     // console.log(this.parsing_table);
@@ -395,7 +395,7 @@ export default class SyntacticExpsDec {
         }
         if (stack_symbol.name === "Synthesize.PROGRAM") {
           console.log(stack_symbol.name);
-          console.log(stack_symbol);
+          this.syntax_tree = stack_symbol.node;
         }
         continue;
       }
@@ -482,6 +482,52 @@ export default class SyntacticExpsDec {
     }
     this.result[0].message = "Success!";
     this.result[0].line_number = "";
+    console.log(this.printThreeAddressCode()[0]);
     return;
+  }
+
+  printTree() {
+    return this.printNode(this.syntax_tree, "");
+  }
+
+  printNode(node, stringOutput) {
+    if (node.left) {
+      stringOutput = this.printNode(node.left, stringOutput);
+    }
+    if (node.right) {
+      stringOutput = this.printNode(node.right, stringOutput);
+    }
+    if (node.center) {
+      stringOutput = this.printNode(node.center, stringOutput);
+    }
+    return stringOutput + node.value + "\n";
+  }
+
+  printThreeAddressCode() {
+    return this.threeAddressCode(this.syntax_tree, [], 1);
+  }
+
+  threeAddressCode(node, code, id) {
+    if (node.left) {
+      node.tempName = `t${id}`;
+      [code, id] = this.threeAddressCode(node.left, code, id + 1);
+    }
+    if (node.right) {
+      [code, id] = this.threeAddressCode(node.right, code, id + 1);
+      code.push(
+        `${node.tempName} = ${node.left.tempName} ${node.value} ${
+          node.right.tempName
+        }`
+      );
+      return [code, id];
+    }
+    if (node.center) {
+      node.tempName = `t${id}`;
+      [code, id] = this.threeAddressCode(node.center, code, id + 1);
+      code.push(`${node.tempName} = ${node.value} ${node.center.tempName}`);
+      return [code, id];
+    }
+    node.tempName = node.value;
+    return [code, id];
   }
 }
