@@ -30,24 +30,145 @@ export default function addActionsToProds(head, production) {
       break;
 
     case "TYPE":
+      if (is_equal(production, ["int"])) {
+        new_production[0] = {
+          name: "int",
+          actions(stack, lexval) {
+            /* TYPE.type = int.lexval */
+            stack[stack.length - 1].type = lexval;
+          }
+        };
+      }
+      if (is_equal(production, ["string"])) {
+        new_production[0] = {
+          name: "string",
+          actions(stack, lexval) {
+            /* TYPE.type = string.lexval */
+            stack[stack.length - 1].type = lexval;
+          }
+        };
+      }
+      if (is_equal(production, ["ident"])) {
+        new_production[0] = {
+          name: "ident",
+          actions(stack, lexval) {
+            /* TYPE.type = ident.lexval */
+            stack[stack.length - 1].type = lexval;
+          }
+        };
+      }
       break;
 
     case "VARDECL":
+      if (is_equal(production, ["TYPE", "ident", "BRACKETS", "MULTIVARDECL"])) {
+        new_production.splice(1, 0, {
+          name: "Synthesize.TYPE",
+          actions(stack) {
+            /* BRACKETS.auxtype = TYPE.type */
+            stack[stack.length - 2].auxtype = this.type;
+            /* MULTIVARDECL.auxtype = TYPE.type */
+            stack[stack.length - 4].auxtype = this.type;
+          }
+        });
+        new_production[2] = {
+          name: "ident",
+          actions(stack, lexval) {
+            /* Send id to Synthesize.BRACKETS to call addType() */
+            stack[stack.length - 2].ident = lexval;
+          }
+        };
+        new_production.splice(4, 0, {
+          name: "Synthesize.BRACKETS",
+          actions(stack, decl_table) {
+            /* addType(ident.id, BRACKETS.type) */
+            decl_table.push({ id: this.ident, type: this.type });
+          }
+        });
+      }
       break;
 
     case "BRACKETS":
+      if (is_equal(production, ["[", "int-constant", "]", "BRACKETS"])) {
+        new_production[1] = {
+          name: "int-constant",
+          actions(stack, lexval) {
+            /* Send lexval to Synthesize.BRACKETS to call array() */
+            stack[stack.length - 3].lexval = lexval;
+          }
+        };
+        new_production[3] = {
+          name: "BRACKETS",
+          /* BRACKETS₁.auxtype = BRACKETS.auxtype */
+          auxtype: head.auxtype
+        };
+        new_production.push({
+          name: "Synthesize.BRACKETS",
+          actions(stack, decl_table) {
+            /* BRACKETS.type = array( int-constant.lexval,  BRACKETS₁.type) */
+            stack[stack.length - 1].type = {
+              array: { n: this.lexval, type: this.type }
+            };
+          }
+        });
+      }
+      if (is_equal(production, ["&"])) {
+        new_production = [
+          {
+            name: "&",
+            auxtype: head.auxtype,
+            actions(stack) {
+              /* BRACKETS.type = BRACKETS.auxtype */
+              stack[stack.length - 1].type = this.auxtype;
+            }
+          }
+        ];
+      }
       break;
 
     case "MULTIVARDECL":
+      if (is_equal(production, ["VARDECLCOMMA", "MULTIVARDECL"])) {
+        new_production[0] = {
+          name: "VARDECLCOMMA",
+          /* VARDECLCOMMA.auxtype = MULTIVARDECL.auxtype */
+          auxtype: head.auxtype
+        };
+        new_production[1] = {
+          name: "MULTIVARDECL",
+          /* MULTIVARDECL₁.auxtype = MULTIVARDECL.auxtype */
+          auxtype: head.auxtype
+        };
+      }
       break;
 
     case "VARDECLCOMMA":
+      if (is_equal(production, [",", "ident", "BRACKETS"])) {
+        new_production[1] = {
+          name: "ident",
+          actions(stack, lexval) {
+            /* Send id to Synthesize.BRACKETS to call addType() */
+            stack[stack.length - 2].ident = lexval;
+          }
+        };
+        new_production[2] = {
+          name: "BRACKETS",
+          /* BRACKETS.auxtype = VARDECLCOMMA.auxtype */
+          auxtype: head.auxtype
+        };
+        new_production.push({
+          name: "Synthesize.BRACKETS",
+          actions(stack, decl_table) {
+            /* addType(ident.id, BRACKETS.type) */
+            decl_table.push({ id: this.ident, type: this.type });
+          }
+        });
+      }
       break;
 
     case "LVALUE":
       if (is_equal(production, ["[", "int-constant", "]", "LVALUE"])) {
         new_production[0] = {
           name: "[",
+          /* LVALUE₁.codeaux = LVALUE.codeaux || '[' int-constant.lexval ']' */
           codeaux: head.codeaux,
           actions(stack, lexval) {
             /* LVALUE₁.codeaux = LVALUE.codeaux || '[' int-constant.lexval ']' */
@@ -80,6 +201,7 @@ export default function addActionsToProds(head, production) {
       if (is_equal(production, [".", "ident", "LVALUEB"])) {
         new_production[0] = {
           name: ".",
+          /* LVALUEB.codeaux = LVALUE.codeaux || '.' ident.lexval */
           codeaux: head.codeaux,
           actions(stack, lexval) {
             /* LVALUEB.codeaux = LVALUE.codeaux || '.' ident.lexval */
@@ -112,6 +234,7 @@ export default function addActionsToProds(head, production) {
       if (is_equal(production, ["(", "int-constant", ")", "LVALUE"])) {
         new_production[0] = {
           name: "(",
+          /* LVALUE.codeaux = LVALUEB.codeaux || '(' int-constant.lexval ')' */
           codeaux: head.codeaux,
           actions(stack, lexval) {
             /* LVALUE.codeaux = LVALUEB.codeaux || '(' int-constant.lexval ')' */
