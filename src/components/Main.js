@@ -406,8 +406,9 @@ ${transitions}}`;
                 <Typography variant="h6" className={classes.title}>
                   <div id="graphCard">{this.checkForGraph()}</div>
                 </Typography>
-                <Divider />
-                <Divider />
+              </Paper>
+
+              <Paper className={classes.paper}>
                 <Typography variant="h6" className={classes.tokenListCell}>
                   Inline Representation (Postorder)
                 </Typography>
@@ -415,8 +416,9 @@ ${transitions}}`;
                 <div id="inlineSyntaxTree" className={classes.tokenListCell}>
                   {this.props.analyser.syntacticExpsDec.printTree()}
                 </div>
-                <Divider />
-                <Divider />
+              </Paper>
+
+              <Paper className={classes.paper}>
                 <Typography variant="h6" className={classes.symbolTableCell}>
                   Three Addres Code
                 </Typography>
@@ -424,10 +426,37 @@ ${transitions}}`;
                 <div id="threeAddressCode" className={classes.symbolTableCell}>
                   {this.props.analyser.syntacticExpsDec
                     .printThreeAddressCode()[0]
-                    .map(e => (
-                      <p>{e}</p>
+                    .map((e, id) => (
+                      <p key={id}>{e}</p>
                     ))}
                 </div>
+              </Paper>
+
+              <Paper className={classes.paper}>
+                <Typography variant="h6" className={classes.title}>
+                  Bytes to be reserved
+                </Typography>
+                <Divider />
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>ID</TableCell>
+                      <TableCell>TYPE</TableCell>
+                      <TableCell>SIZE (bytes)</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {this.props.analyser.syntacticExpsDec
+                      .printDeclarations()
+                      .map((e, id) => (
+                        <TableRow key={id}>
+                          <TableCell>{e.id}</TableCell>
+                          <TableCell>{e.type}</TableCell>
+                          <TableCell>{e.size}</TableCell>
+                        </TableRow>
+                      ))}
+                  </TableBody>
+                </Table>
               </Paper>
             </Grid>
             <Grid item xs={12} md={6}>

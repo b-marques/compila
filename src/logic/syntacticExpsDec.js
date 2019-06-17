@@ -142,6 +142,7 @@ export default class SyntacticExpsDec {
     this.stack = [];
     this.result = [{ message: "", line_number: "" }];
     this.syntax_tree = {};
+    this.decl_table = [];
     // console.log(this.first);
     // console.log(this.follow);
     // console.log(this.parsing_table);
@@ -363,6 +364,9 @@ export default class SyntacticExpsDec {
       return;
     }
 
+    /* Zera tabela de declaração de variáveis */
+    this.decl_table = [];
+
     /* Add símbolo $ e símbolo inicial à pilha */
     this.stack = [
       { name: "$" },
@@ -388,6 +392,11 @@ export default class SyntacticExpsDec {
         stack_symbol.name.includes("Synthesize") ||
         stack_symbol.name.includes("Action")
       ) {
+        if (stack_symbol.name === "Synthesize.BRACKETS") {
+          console.log(stack_symbol.name);
+          stack_symbol.actions(this.stack, this.decl_table);
+          continue;
+        }
         if (stack_symbol.actions !== undefined) {
           stack_symbol.actions(this.stack);
           console.log(stack_symbol.name);
@@ -482,7 +491,9 @@ export default class SyntacticExpsDec {
     }
     this.result[0].message = "Success!";
     this.result[0].line_number = "";
-    console.log(this.printThreeAddressCode()[0]);
+
+    console.log(this.decl_table);
+    console.log(this.printDeclarations());
     return;
   }
 
@@ -527,7 +538,42 @@ export default class SyntacticExpsDec {
       code.push(`${node.tempName} = ${node.value} ${node.center.tempName}`);
       return [code, id];
     }
+    if (node.value && node.value.includes("[")) {
+      node.tempName = `t${id}`;
+      code.push(`${node.tempName} = ${node.value}`);
+      return [code, id];
+    }
     node.tempName = node.value;
     return [code, id];
+  }
+
+  printDeclarations() {
+    let output = [];
+    for (let i in this.decl_table) {
+      let size = 1;
+      let type = "";
+      let id = this.decl_table[i].id;
+
+      if (typeof this.decl_table[i].type !== "object") {
+        output[i] = {
+          id: id,
+          type: this.decl_table[i].type,
+          size: this.decl_table[i].type === "int" ? 4 : 1
+        };
+        continue;
+      }
+      let aux = this.decl_table[i].type.array;
+      while (typeof aux.type === "object") {
+        size *= Number(aux.n);
+        type += "array, ";
+        aux = aux.type.array;
+      }
+      type += "array, ";
+      size *= Number(aux.n);
+      size *= aux.type === "int" ? 4 : 1;
+      type += aux.type;
+      output[i] = { id: id, type: type, size: size };
+    }
+    return output;
   }
 }
