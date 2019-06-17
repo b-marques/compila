@@ -357,15 +357,17 @@ export default class SyntacticExpsDec {
     /* Make a local copy of the symbol table */
     this.symbol_table = JSON.parse(JSON.stringify(symbol_table));
 
+    /* Zera tabela de declaração de variáveis */
+    this.decl_table = [];
+    /* Zera árvore sitnaxe */
+    this.syntax_tree = {};
+
     /* Check if symbol table not empty */
     if (!this.symbol_table.length) {
       this.result[0].message = "Empty symbol table!";
       this.result[0].line_number = "";
       return;
     }
-
-    /* Zera tabela de declaração de variáveis */
-    this.decl_table = [];
 
     /* Add símbolo $ e símbolo inicial à pilha */
     this.stack = [
