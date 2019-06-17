@@ -1,3 +1,11 @@
+/*
+ *  @file syntacticExpsDec.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 18/06/2019
+ *  @version 1.0
+ */
+
 import addActionsToProds from "./sdtExpsDec.js";
 
 export default class SyntacticExpsDec {

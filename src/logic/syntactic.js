@@ -1,3 +1,11 @@
+/*
+ *  @file syntactic.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 18/06/2019
+ *  @version 1.0
+ */
+
 export default class Syntactic {
   constructor() {
     this.T = new Set([

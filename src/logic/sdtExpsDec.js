@@ -1,3 +1,11 @@
+/*
+ *  @file sdtExpsDec.js
+ *
+ *  @author Bruno Marques do Nascimento
+ *  @date 18/06/2019
+ *  @version 1.0
+ */
+
 export default function addActionsToProds(head, production) {
   let new_production = production_to_object(production);
   switch (head.name) {
