@@ -718,28 +718,27 @@ export default class Syntactic {
         for (let prod2 in production.prods) {
           if (prod1 !== prod2) {
             /* Condições 1 e 2 */
-            let setA = new Set(production.prods[prod1]);
-            let setB = new Set(production.prods[prod2]);
-            let firstA = this.get_first(setA);
-            let firstB = this.get_first(setB);
-            is_ll1 = is_ll1 && this.is_disjoint(firstA, firstB);
+            let setAlpha = new Set(production.prods[prod1]);
+            let setBeta = new Set(production.prods[prod2]);
+            let firstAlpha = this.get_first(setAlpha);
+            let firstBeta = this.get_first(setBeta);
+            is_ll1 = is_ll1 && this.is_disjoint(firstAlpha, firstBeta);
 
             /* Condição 3 */
-            if (firstB.has("&")) {
+            if (firstBeta.has("&")) {
               is_ll1 =
                 is_ll1 &&
-                this.is_disjoint(firstA, this.follow[production.head]);
+                this.is_disjoint(firstAlpha, this.follow[production.head]);
             }
-            if (firstA.has("&")) {
+            if (firstAlpha.has("&")) {
               is_ll1 =
                 is_ll1 &&
-                this.is_disjoint(firstB, this.follow[production.head]);
+                this.is_disjoint(firstBeta, this.follow[production.head]);
             }
           }
         }
       }
     }
-
     return is_ll1;
   }
 
