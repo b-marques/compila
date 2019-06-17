@@ -379,7 +379,6 @@ export default class Syntactic {
     }
 
     this.compute_first_set();
-
     this.compute_follow_set();
 
     this.parsing_table = [];
@@ -394,7 +393,7 @@ export default class Syntactic {
     console.log(`A gramatática é LL(1)? ${this.is_ll1()}`);
   }
 
-  compute_first_set(head) {
+  compute_first_set() {
     let old_first = [];
     let add_terminals_epsilon = false;
     while (true) {
