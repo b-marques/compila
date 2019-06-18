@@ -1,14 +1,14 @@
 {
-  "main.css": "/compila/static/css/main.79713739.chunk.css",
-  "main.js": "/compila/static/js/main.5648076c.chunk.js",
-  "main.js.map": "/compila/static/js/main.5648076c.chunk.js.map",
-  "static/js/1.0f034f8e.chunk.js": "/compila/static/js/1.0f034f8e.chunk.js",
-  "static/js/1.0f034f8e.chunk.js.map": "/compila/static/js/1.0f034f8e.chunk.js.map",
+  "main.css": "/compila/static/css/main.41167295.chunk.css",
+  "main.js": "/compila/static/js/main.28d55dde.chunk.js",
+  "main.js.map": "/compila/static/js/main.28d55dde.chunk.js.map",
+  "static/js/1.508b8d8b.chunk.js": "/compila/static/js/1.508b8d8b.chunk.js",
+  "static/js/1.508b8d8b.chunk.js.map": "/compila/static/js/1.508b8d8b.chunk.js.map",
   "runtime~main.js": "/compila/static/js/runtime~main.0d99768a.js",
   "runtime~main.js.map": "/compila/static/js/runtime~main.0d99768a.js.map",
   "static/media/logo.svg": "/compila/static/media/logo.ad3d725a.svg",
-  "static/css/main.79713739.chunk.css.map": "/compila/static/css/main.79713739.chunk.css.map",
+  "static/css/main.41167295.chunk.css.map": "/compila/static/css/main.41167295.chunk.css.map",
   "index.html": "/compila/index.html",
-  "precache-manifest.9dfb769e760671a38ecc955bc0ed6196.js": "/compila/precache-manifest.9dfb769e760671a38ecc955bc0ed6196.js",
+  "precache-manifest.7f6015326203d8d32a7204512a32d512.js": "/compila/precache-manifest.7f6015326203d8d32a7204512a32d512.js",
   "service-worker.js": "/compila/service-worker.js"
 }
