@@ -37,6 +37,10 @@ class Visitor extends statVisitor {
     return "t" + this.temporary;
   }
 
+  addType(id, type) {
+    console.log(`added id: ${id}, type: ${JSON.stringify(type)}`);
+  }
+
   firstChild(ctx) {
     let first_child;
     if (ctx.children === null) {
@@ -63,34 +67,68 @@ class Visitor extends statVisitor {
 
   visitStatement(ctx, attributes) {
     let local_attributes = {};
+    let brackets = {};
+    let multivardecl = {};
     switch (this.firstChild(ctx)) {
       /* STATEMENT -> int ident BRACKETS MULTIVARDECL ; */
-      case "IntConstant":
-        break;
+      case "Int":
+        /* BRACKETS.auxtype = int.lexval */
+        brackets.auxtype = ctx.getChild(0).getText();
+        brackets = this.visitBrackets(ctx.getChild(2), brackets);
+
+        /* addType(ident.id, BRACKETS.type) */
+        this.addType(ctx.getChild(1).symbol.tokenIndex, brackets.type);
+
+        /* MULTIVARDECL.auxtype = int.lexval */
+        multivardecl.auxtype = ctx.getChild(0).getText();
+        multivardecl = this.visitMultivardecl(ctx.getChild(3), multivardecl);
+
+        /* STATEMENT.code = '' */
+        return { code: "" };
 
       /* STATEMENT -> string ident BRACKETS MULTIVARDECL ; */
-      case "StringConstant":
-        break;
+      case "String":
+        /* BRACKETS.auxtype = string.lexval */
+        brackets.auxtype = ctx.getChild(0).getText();
+        brackets = this.visitBrackets(ctx.getChild(2), brackets);
+
+        /* addType(ident.id, BRACKETS.type) */
+        this.addType(ctx.getChild(1).symbol.tokenIndex, brackets.type);
+
+        /* MULTIVARDECL.auxtype = string.lexval */
+        multivardecl.auxtype = ctx.getChild(0).getText();
+        multivardecl = this.visitMultivardecl(ctx.getChild(3), multivardecl);
+
+        /* STATEMENT.code = '' */
+        return { code: "" };
 
       /* STATEMENT -> ident VARORATRIB */
       case "Identifier":
-        break;
+        let varoratrib = {};
+        /* VARORATRIB.identaux = ident.lexval */
+        varoratrib.identaux = ctx.getChild(0).getText();
+
+        varoratrib = this.visitVaroratrib(ctx.getChild(1), varoratrib);
+        /* STATEMENT.code = VARORATRIB.code */
+        return { code: varoratrib.code + "\n" };
 
       /* STATEMENT -> PRINTSTAT ; */
       case "printstat":
-        break;
+        let printstat = this.visitPrintstat(ctx.getChild(0));
+        /* STATEMENT.code = PRINTSTAT.code */
+        return { code: printstat.code };
 
       /* STATEMENT -> READSTAT ; */
       case "readstat":
-        break;
+        let readstat = this.visitReadstat(ctx.getChild(0));
+        /* STATEMENT.code = READSTAT.code */
+        return { code: readstat.code };
 
       /* STATEMENT -> RETURNSTAT ; */
       case "returnstat":
-        return this.visitReturnstat(ctx.getChild(0));
-
-      /* STATEMENT -> SUPERSTAT ; */
-      case "superstat":
-        break;
+        let returnstat = this.visitReturnstat(ctx.getChild(0));
+        /* STATEMENT.code = RETURNSTAT.code */
+        return { code: returnstat.code };
 
       /* STATEMENT -> IFSTAT */
       case "ifstat":
@@ -121,6 +159,94 @@ class Visitor extends statVisitor {
     }
   }
 
+  visitVaroratrib(ctx, attributes) {
+    switch (this.firstChild(ctx)) {
+      /* VARORATRIB -> ident BRACKETS MULTIVARDECL ; */
+      case "Identifier":
+        let brackets = {};
+        /* BRACKETS.auxtype = VARORATRIB.identaux */
+        brackets.auxtype = attributes.identaux;
+        brackets = this.visitBrackets(ctx.getChild(1), brackets);
+
+        /* addType(ident.id, BRACKETS.type) */
+        this.addType(ctx.getChild(0).symbol.tokenIndex, brackets.type);
+
+        let multivardecl = {};
+        /* MULTIVARDECL.auxtype = VARORATRIB.identaux */
+        multivardecl.auxtype = attributes.identaux;
+        multivardecl = this.visitMultivardecl(ctx.getChild(2), multivardecl);
+
+        /* VARORATRIB.code = '' */
+        return { code: "" };
+
+      /* VARORATRIB -> LVALUE = ATRIBSTATB ; */
+      case "lvalue":
+        let lvalue = {};
+        /* LVALUE.codeaux = VARORATRIB.identaux */
+        lvalue.codeaux = attributes.identaux;
+        lvalue = this.visitLvalue(ctx.getChild(0), lvalue);
+
+        let atribstatb = this.visitAtribstatb(ctx.getChild(2));
+
+        return {
+          /* VARORATRIB.code = ATRIBSTATB.code || LVALUE.addr '=' ATRIBSTATB.addr */
+          code: `${atribstatb.code}\n` + `${lvalue.addr} = ${atribstatb.addr}`
+        };
+    }
+  }
+
+  /* ATRIBSTAT -> ident LVALUE = ATRIBSTATB */
+  visitAtribstat(ctx) {
+    let lvalue = {};
+    /* LVALUE.codeaux = ident.lexval */
+    lvalue.codeaux = ctx.getChild(0).getText();
+
+    lvalue = this.visitLvalue(ctx.getChild(1), lvalue);
+
+    let atribstatb = this.visitAtribstatb(ctx.getChild(3));
+
+    return {
+      /* ATRIBSTAT.code = ATRIBSTATB.code || LVALUE.addr '=' ATRIBSTATB.addr */
+      code: `${atribstatb.code}\n` + `${lvalue.addr} = ${atribstatb.addr}`
+    };
+  }
+
+  /* ATRIBSTATB -> NUMEXPRESSION */
+  visitAtribstatb(ctx) {
+    let numexpression = this.visitNumexpression(ctx.getChild(0));
+    return {
+      /* ATRIBSTATB.code = NUMEXPRESSION.code */
+      code: numexpression.code,
+      /* ATRIBSTATB.addr = NUMEXPRESSION.addr */
+      addr: numexpression.addr
+    };
+  }
+
+  /* PRINTSTAT -> print NUMEXPRESSION */
+  visitPrintstat(ctx) {
+    let numexpression = this.visitNumexpression(ctx.getChild(1));
+
+    /* PRINTSTAT.code = NUMEXPRESSION.code || out || NUMEXPRESSION.addr */
+    return { code: `${numexpression.code}\nout ${numexpression.addr}` };
+  }
+
+  /* READSTAT -> read ident LVALUE */
+  visitReadstat(ctx) {
+    let lvalue = {};
+    /* LVALUE.codeaux = ident.lexval */
+    lvalue.codeaux = ctx.getChild(1).getText();
+
+    lvalue = this.visitLvalue(ctx.getChild(2), lvalue);
+
+    /* READSTAT.code = in || LVALUE.addr */
+    return { code: `in ${lvalue.addr}` };
+  }
+
+  /* RETURNSTAT -> return RETURNSTATB */
+  visitReturnstat(ctx) {
+    return { code: "goto end" };
+  }
+
   visitIfstat(ctx, attributes) {
     let local_attributes = {};
     let numexpression, statement, code;
@@ -139,10 +265,10 @@ class Visitor extends statVisitor {
         /* IFSTAT.false = IFSTAT.next */
         attributes.false = attributes.next;
         /* IFSTAT.code = NUMEXPRESSION.code 
-                         || if NUMEXPRESSION.addr goto IFSTAT.true
-                         || goto label(IFSTAT.false)
-                         || label(IFSTAT.true)
-                         || STATEMENT.code */
+                           || if NUMEXPRESSION.addr goto IFSTAT.true
+                           || goto label(IFSTAT.false)
+                           || label(IFSTAT.true)
+                           || STATEMENT.code */
         code = [
           numexpression.code,
           `if ${numexpression.addr} goto ${attributes.true}`,
@@ -175,12 +301,12 @@ class Visitor extends statVisitor {
         /* IFSTAT.false = newLabel() */
         attributes.false = this.newLabel();
         /* IFSTAT.code = NUMEXPRESSION.code
-                        || if NUMEXPRESSION.addr goto IFSTAT.true
-                        || goto label(IFSTAT.false)
-                        || label(IFSTAT.true)
-                        || STATEMENT₁.code
-                        || label(IFSTAT.false)
-                        || STATEMENT₂.code */
+                          || if NUMEXPRESSION.addr goto IFSTAT.true
+                          || goto label(IFSTAT.false)
+                          || label(IFSTAT.true)
+                          || STATEMENT₁.code
+                          || label(IFSTAT.false)
+                          || STATEMENT₂.code */
         code = [
           numexpression.code,
           `if ${numexpression.addr} goto ${attributes.true}`,
@@ -196,8 +322,56 @@ class Visitor extends statVisitor {
         };
     }
   }
-  visitReturnstat(ctx) {
-    return { code: "goto end" };
+
+  visitBrackets(ctx, attributes) {
+    switch (this.firstChild(ctx)) {
+      /* BRACKETS -> [ int-constant ] BRACKETS₁ */
+      case "LeftBracket":
+        let brackets = {};
+        /* BRACKETS₁.auxtype = BRACKETS.auxtype */
+        brackets.auxtype = attributes.auxtype;
+        brackets = this.visitBrackets(ctx.getChild(3), brackets);
+
+        return {
+          /* BRACKETS.type = array( int-constant.lexval,  BRACKETS₁.type) */
+          type: { array: { n: ctx.getChild(1).getText(), type: brackets.type } }
+        };
+
+      /* BRACKETS -> 𝝐 */
+      default:
+        /* BRACKETS.type = BRACKETS.auxtype */
+        return { type: attributes.auxtype };
+    }
+  }
+
+  visitMultivardecl(ctx, attributes) {
+    switch (this.firstChild(ctx)) {
+      /* MULTIVARDECL -> VARDECLCOMMA MULTIVARDECL₁ */
+      case "vardeclcomma":
+        let vardeclcomma = {};
+        /* VARDECLCOMMA.auxtype = MULTIVARDECL.auxtype */
+        vardeclcomma.auxtype = attributes.auxtype;
+        vardeclcomma = this.visitVardeclcomma(ctx.getChild(0), vardeclcomma);
+
+        let multivardecl = {};
+        /* MULTIVARDECL₁.auxtype = MULTIVARDECL.auxtype */
+        multivardecl.auxtype = attributes.auxtype;
+        multivardecl = this.visitMultivardecl(ctx.getChild(1), multivardecl);
+
+      /* MULTIVARDECL -> 𝝐 */
+      default:
+        return;
+    }
+  }
+  /* VARDECLCOMMA -> , ident BRACKETS */
+  visitVardeclcomma(ctx, attributes) {
+    let brackets = {};
+    /* BRACKETS.auxtype = VARDECLCOMMA.auxtype */
+    brackets.auxtype = attributes.auxtype;
+    brackets = this.visitBrackets(ctx.getChild(2), brackets);
+
+    /* addType(ident.id, BRACKETS.type) */
+    this.addType(ctx.getChild(1).symbol.tokenIndex, brackets.type);
   }
 
   /* NUMEXPRESSION -> TERM TERMS */
@@ -252,7 +426,7 @@ class Visitor extends statVisitor {
                          || TERM.code
                          || TERMS.addr '=' TERMS.inha '+' TERM.addr */
         local_attributes.inhc =
-          `${attributes.inhc}` +
+          `${attributes.inhc}\n` +
           `${term.code}\n` +
           `${attributes.addr} = ${attributes.inha} + ${term.addr}`;
 
@@ -277,7 +451,7 @@ class Visitor extends statVisitor {
                          || TERM.code
                          || TERMS.addr '=' TERMS.inha '-' TERM.addr */
         local_attributes.inhc =
-          `${attributes.inhc}` +
+          `${attributes.inhc}\n` +
           `${term.code}\n` +
           `${attributes.addr} = ${attributes.inha} - ${term.addr}`;
 
@@ -428,15 +602,119 @@ class Visitor extends statVisitor {
 
   visitFactor(ctx) {
     switch (this.firstChild(ctx)) {
+      /* FACTOR -> int-constant */
       case "IntConstant":
         return { addr: ctx.getText(), code: "" };
+
+      /* FACTOR -> string-constant */
       case "StringConstant":
         return { addr: ctx.getText(), code: "" };
+
+      /* FACTOR -> null */
       case "Null":
+        return { addr: ctx.getText(), code: "" };
+
+      /* FACTOR -> ident LVALUE */
       case "Identifier":
+        let local_attributes = {};
+
+        local_attributes.codeaux = ctx.getChild(0).getText();
+
+        let lvalue = this.visitLvalue(ctx.getChild(1), local_attributes);
+
+        /**
+         *  if( LVALUE.addr.has('[') || LVALUE.addr.has('.'))
+         *    FACTOR.addr = newTemporary()
+         *    FACTOR.code = FACTOR.addr '=' LVALUE.addr
+         *  else
+         *    FACTOR.addr = LVALUE.addr
+         *    FACTOR.code = ''
+         */
+        if (lvalue.addr.includes("[") || lvalue.addr.includes(".")) {
+          /* FACTOR.addr = newTemporary() */
+          let addr = this.newTemporary();
+          return {
+            addr: addr,
+            /* FACTOR.code = FACTOR.addr '=' LVALUE.addr */
+            code: `${addr} = ${lvalue.addr}`
+          };
+        } else {
+          return {
+            /* FACTOR.addr = LVALUE.addr*/
+            addr: lvalue.addr,
+            /* FACTOR.code = '' */
+            code: ""
+          };
+        }
+
+      /* FACTOR -> ( NUMEXPRESSION ) */
       case "LeftParen":
+        let numexpression = this.visitNumexpression(ctx.getChild(1));
+
+        return {
+          /* FACTOR.addr = NUMEXPRESSION.addr */
+          addr: numexpression.addr,
+          /* FACTOR.code = NUMEXPRESSION.code */
+          code: numexpression.code
+        };
+    }
+  }
+
+  visitLvalue(ctx, attributes) {
+    let local_attributes = {};
+    switch (this.firstChild(ctx)) {
+      /* LVALUE -> [ int-constant ] LVALUE₁ */
+      case "LeftBracket":
+        /* LVALUE₁.codeaux = LVALUE.codeaux || '[' int-constant.lexval ']' */
+        local_attributes.codeaux =
+          attributes.codeaux + `[${ctx.getChild(1).getText()}]`;
+
+        let lvalue = this.visitLvalue(ctx.getChild(3), local_attributes);
+
+        /* LVALUE.addr = LVALUE₁.addr */
+        return { addr: lvalue.addr };
+
+      /* LVALUE -> . ident LVALUEB */
+      case "Dot":
+        /* LVALUEB.codeaux = LVALUE.codeaux || '.' ident.lexval */
+        local_attributes.codeaux =
+          attributes.codeaux + `.${ctx.getChild(1).getText()}`;
+
+        let lvalueb = this.visitLvalueb(ctx.getChild(2), local_attributes);
+
+        /* LVALUE.addr = LVALUEB.addr */
+        return { addr: lvalueb.addr };
+
       default:
-        return;
+        /* LVALUE.addr = LVALUE.codeaux */
+        return { addr: attributes.codeaux };
+    }
+  }
+
+  visitLvalueb(ctx, attributes) {
+    let local_attributes = {};
+    let lvalue;
+    switch (this.firstChild(ctx)) {
+      /* LVALUEB -> ( int-constant ) LVALUE */
+      case "LeftParen":
+        /* LVALUE.codeaux = LVALUEB.codeaux || '(' int-constant.lexval ')'  */
+        local_attributes.codeaux =
+          attributes.codeaux + `(${ctx.getChild(1).getText()})`;
+
+        lvalue = this.visitLvalue(ctx.getChild(3), local_attributes);
+
+        /* LVALUEB.addr = LVALUE.addr */
+        return { addr: lvalue.addr };
+
+      /* LVALUEB -> LVALUE */
+      case "lvalue":
+        /* LVALUE.codeaux = LVALUEB.codeaux */
+        local_attributes.codeaux = attributes.codeaux;
+
+        lvalue = this.visitLvalue(ctx.getChild(0), local_attributes);
+
+        /* LVALUEB.addr = LVALUE.addr */
+        return { addr: lvalue.addr };
     }
   }
 }
