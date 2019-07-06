@@ -8,7 +8,6 @@ statement:
 	| printstat ';'
 	| readstat ';'
 	| returnstat ';'
-	| superstat ';'
 	| ifstat
 	| forstat
 	| '{' statlist '}'
@@ -30,8 +29,6 @@ readstat: 'read' Identifier lvalue;
 returnstat: 'return' returnstatb;
 
 returnstatb: numexpression | /* epsilon */;
-
-superstat: 'super' '(' IntConstant ')';
 
 ifstat:
 	'if' '(' numexpression ')' statement

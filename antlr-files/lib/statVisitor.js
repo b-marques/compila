@@ -60,12 +60,6 @@ statVisitor.prototype.visitReturnstatb = function(ctx) {
 };
 
 
-// Visit a parse tree produced by statParser#superstat.
-statVisitor.prototype.visitSuperstat = function(ctx) {
-  return this.visitChildren(ctx);
-};
-
-
 // Visit a parse tree produced by statParser#ifstat.
 statVisitor.prototype.visitIfstat = function(ctx) {
   return this.visitChildren(ctx);

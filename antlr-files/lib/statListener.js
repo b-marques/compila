@@ -83,15 +83,6 @@ statListener.prototype.exitReturnstatb = function(ctx) {
 };
 
 
-// Enter a parse tree produced by statParser#superstat.
-statListener.prototype.enterSuperstat = function(ctx) {
-};
-
-// Exit a parse tree produced by statParser#superstat.
-statListener.prototype.exitSuperstat = function(ctx) {
-};
-
-
 // Enter a parse tree produced by statParser#ifstat.
 statListener.prototype.enterIfstat = function(ctx) {
 };
