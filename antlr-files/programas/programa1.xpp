@@ -7,7 +7,7 @@
   for(i = 1; i - n; i = i + 1){
     string n;
     ife(i % 2){
-      sum_impar = sum_impar + 1;
+      sum_impar = sum_impar + i;
     } else {
       sum_par = sum_par + i;
     }
