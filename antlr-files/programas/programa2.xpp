@@ -1,0 +1,28 @@
+{
+  int i, j;
+  int width, height;
+  
+  print "Informe a largura da matriz:";
+  read width;
+  print "Informe a altura da matriz:";
+  read height;
+
+  for(i = 0; i - width; i = i + 1){
+    for(j = 0; j - height; j = j + 1){
+      ife(i*j - 25){
+        if(j)
+          string j;
+          j = "j";
+          print j;
+        if(i)
+          string i;
+          i = "i";
+          print i;  
+      } else {
+        break;
+      }
+      if(j - 60)
+        return;
+    }
+  }
+}

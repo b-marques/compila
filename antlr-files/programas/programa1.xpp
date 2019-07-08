@@ -1,0 +1,20 @@
+{
+  int i, sum_par, sum_impar;
+  int n;
+  print "Informe um número:";
+  read n;
+
+  for(i = 1; i - n; i = i + 1){
+    string n;
+    ife(i % 2){
+      sum_impar = sum_impar + 1;
+    } else {
+      sum_par = sum_par + i;
+    }
+  }
+  
+  print "A somatória dos números ímpar é:";
+  print sum_par;
+  print "A somatória dos números ímpar é:";
+  print sum_par;
+}
